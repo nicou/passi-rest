@@ -1,4 +1,4 @@
-package com.websystique.springmvc;
+package fi.softala.ttl;
  
 import java.net.URI;
 import java.util.LinkedHashMap;
@@ -10,7 +10,7 @@ import fi.softala.ttl.model.User;
  
 public class SpringRestTestClient {
  
-    public static final String REST_SERVICE_URI = "http://localhost:8080/Spring4MVCCRUDRestService";
+    public static final String REST_SERVICE_URI = "http://localhost:8080/passi-rest";
      
     /* GET */
     @SuppressWarnings("unchecked")
