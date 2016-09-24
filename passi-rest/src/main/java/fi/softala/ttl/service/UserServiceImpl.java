@@ -18,8 +18,8 @@ public class UserServiceImpl implements UserService{
 	
 	private static List<User> users;
 	
-	static{
-		users= populateDummyUsers();
+	static {
+		users = populateDummyUsers();
 	}
 
 	public List<User> findAllUsers() {
@@ -27,8 +27,8 @@ public class UserServiceImpl implements UserService{
 	}
 	
 	public User findById(long id) {
-		for(User user : users){
-			if(user.getId() == id){
+		for (User user : users) {
+			if (user.getId() == id) {
 				return user;
 			}
 		}
@@ -36,8 +36,8 @@ public class UserServiceImpl implements UserService{
 	}
 	
 	public User findByName(String name) {
-		for(User user : users){
-			if(user.getName().equalsIgnoreCase(name)){
+		for (User user : users) {
+			if (user.getUsername().equalsIgnoreCase(name)) {
 				return user;
 			}
 		}
@@ -55,7 +55,6 @@ public class UserServiceImpl implements UserService{
 	}
 
 	public void deleteUserById(long id) {
-		
 		for (Iterator<User> iterator = users.iterator(); iterator.hasNext(); ) {
 		    User user = iterator.next();
 		    if (user.getId() == id) {
@@ -65,7 +64,7 @@ public class UserServiceImpl implements UserService{
 	}
 
 	public boolean isUserExist(User user) {
-		return findByName(user.getName())!=null;
+		return findByName(user.getUsername()) != null;
 	}
 	
 	public void deleteAllUsers(){
@@ -74,11 +73,7 @@ public class UserServiceImpl implements UserService{
 
 	private static List<User> populateDummyUsers(){
 		List<User> users = new ArrayList<User>();
-		users.add(new User(counter.incrementAndGet(),"Sam",30, 70000));
-		users.add(new User(counter.incrementAndGet(),"Tom",40, 50000));
-		users.add(new User(counter.incrementAndGet(),"Jerome",45, 30000));
-		users.add(new User(counter.incrementAndGet(),"Silvia",50, 40000));
+		users.add(new User(counter.incrementAndGet(), "admin", "passw"));
 		return users;
 	}
-
 }

@@ -4,21 +4,18 @@ public class User {
 
 	private long id;
 	
-	private String name;
+	private String username;
 	
-	private int age;
-	
-	private double salary;
+	private String password;
 
-	public User(){
-		id=0;
+	public User() {
+		id = 0;
 	}
 	
-	public User(long id, String name, int age, double salary){
+	public User(long id, String username, String password) {
 		this.id = id;
-		this.name = name;
-		this.age = age;
-		this.salary = salary;
+		this.username = username;
+		this.password = password;
 	}
 	
 	public long getId() {
@@ -29,28 +26,20 @@ public class User {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
-	public int getAge() {
-		return age;
+	public String getPassword() {
+		return password;
 	}
 
-	public void setAge(int age) {
-		this.age = age;
-	}
-
-	public double getSalary() {
-		return salary;
-	}
-
-	public void setSalary(double salary) {
-		this.salary = salary;
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	@Override
@@ -74,12 +63,4 @@ public class User {
 			return false;
 		return true;
 	}
-
-	@Override
-	public String toString() {
-		return "User [id=" + id + ", name=" + name + ", age=" + age
-				+ ", salary=" + salary + "]";
-	}
-
-
 }

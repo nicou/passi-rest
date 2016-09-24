@@ -25,7 +25,7 @@ public class PassiRestController {
 	
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String index() {
-		return "RESTful Web Service for the PASSI Application is Running";
+		return "<html><head><title>REST Web Service</title></head><body><p>REST Web Service running nice and smooth</p></body></html>";
 	}
 
 	@RequestMapping(value = "/user/", method = RequestMethod.GET)
@@ -50,9 +50,9 @@ public class PassiRestController {
 	
 	@RequestMapping(value = "/user/", method = RequestMethod.POST)
 	public ResponseEntity<Void> createUser(@RequestBody User user, UriComponentsBuilder ucBuilder) {
-		System.out.println("Creating User " + user.getName());
+		System.out.println("Creating User " + user.getUsername());
 		if (userService.isUserExist(user)) {
-			System.out.println("A User with name " + user.getName() + " already exist");
+			System.out.println("A User with name " + user.getUsername() + " already exist");
 			return new ResponseEntity<Void>(HttpStatus.CONFLICT);
 		}
 		userService.saveUser(user);
@@ -69,9 +69,8 @@ public class PassiRestController {
 			System.out.println("User with id " + id + " not found");
 			return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
 		}
-		currentUser.setName(user.getName());
-		currentUser.setAge(user.getAge());
-		currentUser.setSalary(user.getSalary());
+		currentUser.setUsername(user.getUsername());
+		currentUser.setPassword(user.getPassword());
 		userService.updateUser(currentUser);
 		return new ResponseEntity<User>(currentUser, HttpStatus.OK);
 	}
