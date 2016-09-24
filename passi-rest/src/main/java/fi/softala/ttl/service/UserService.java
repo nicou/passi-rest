@@ -2,11 +2,12 @@ package fi.softala.ttl.service;
 
 import java.util.List;
 
+import fi.softala.ttl.model.Student;
 import fi.softala.ttl.model.User;
 
-
-
 public interface UserService {
+	
+	Student findStudentByUsername(String username);
 	
 	User findById(long id);
 	

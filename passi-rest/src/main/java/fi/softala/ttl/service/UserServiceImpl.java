@@ -5,14 +5,29 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.inject.Inject;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import fi.softala.ttl.dao.PassiDAO;
+import fi.softala.ttl.model.Student;
 import fi.softala.ttl.model.User;
 
 @Service("userService")
 @Transactional
 public class UserServiceImpl implements UserService{
+	
+	@Inject
+	private PassiDAO dao;
+
+	public PassiDAO getDao() {
+		return dao;
+	}
+
+	public void setDao(PassiDAO dao) {
+		this.dao = dao;
+	}
 	
 	private static final AtomicLong counter = new AtomicLong();
 	
@@ -20,6 +35,12 @@ public class UserServiceImpl implements UserService{
 	
 	static {
 		users = populateDummyUsers();
+	}
+	
+	public Student findStudentByUsername(String username) {
+		Student student = new Student();
+		student = dao.getStudent(username);
+		return student;
 	}
 
 	public List<User> findAllUsers() {

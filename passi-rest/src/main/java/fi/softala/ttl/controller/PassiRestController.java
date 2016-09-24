@@ -1,3 +1,6 @@
+/**
+ * @author Mika Ropponen
+ */
 package fi.softala.ttl.controller;
 
 import java.util.List;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import fi.softala.ttl.model.Student;
 import fi.softala.ttl.model.User;
 import fi.softala.ttl.service.UserService;
 
@@ -25,7 +29,7 @@ public class PassiRestController {
 	
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String index() {
-		return "<html><head><title>REST Web Service</title></head><body><p>REST Web Service running nice and smooth</p></body></html>";
+		return "<html><head><title>REST Web Service</title></head><body><p>REST Web Service for PASSI Application running nice and smoothly :)</p></body></html>";
 	}
 
 	@RequestMapping(value = "/user/", method = RequestMethod.GET)
@@ -37,15 +41,16 @@ public class PassiRestController {
 		return new ResponseEntity<List<User>>(users, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/user/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<User> getUser(@PathVariable("id") long id) {
-		System.out.println("Fetching User with id " + id);
-		User user = userService.findById(id);
-		if (user == null) {
-			System.out.println("User with id " + id + " not found");
-			return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
+	// Get student by username
+	@RequestMapping(value = "/student/{username}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Student> getStudent(@PathVariable("username") String username) {
+		System.out.println("Fetching student with username = " + username);
+		Student student = userService.findStudentByUsername(username);
+		if (student == null) {
+			System.out.println("Student with username = " + username + " not found");
+			return new ResponseEntity<Student>(HttpStatus.NOT_FOUND);
 		}
-		return new ResponseEntity<User>(user, HttpStatus.OK);
+		return new ResponseEntity<Student>(student, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/user/", method = RequestMethod.POST)
