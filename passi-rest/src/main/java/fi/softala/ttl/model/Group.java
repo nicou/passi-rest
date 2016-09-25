@@ -11,20 +11,20 @@ public class Group implements Serializable {
 	
 	private String groupID;
 	private String groupName;
-	private String instructorID;
+	private Instructor instructor;
 	
 	public Group() {
 		super();
 		this.groupID = "";
 		this.groupName = "";
-		this.instructorID = "";
+		this.instructor = null;
 	}
 
-	public Group(String groupID, String groupName, String instructorID) {
+	public Group(String groupID, String groupName, Instructor instructor) {
 		super();
 		this.groupID = groupID;
 		this.groupName = groupName;
-		this.instructorID = instructorID;
+		this.instructor = instructor;
 	}
 
 	public String getGroupID() {
@@ -43,16 +43,11 @@ public class Group implements Serializable {
 		this.groupName = groupName;
 	}
 
-	public String getInstructorID() {
-		return instructorID;
+	public Instructor getInstructor() {
+		return instructor;
 	}
 
-	public void setInstructorID(String instructorID) {
-		this.instructorID = instructorID;
+	public void setInstructor(Instructor instructor) {
+		this.instructor = instructor;
 	}
-
-	@Override
-	public String toString() {
-		return "Group [groupID=" + groupID + ", groupName=" + groupName + ", instructorID=" + instructorID + "]";
-	}	
 }
