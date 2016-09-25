@@ -28,7 +28,7 @@ public class PassiRestController {
 	
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String index() {
-		return "<html><head><title>REST Web Service</title></head><body><p>REST Web Service for PASSI Application running nice and smoothly :)</p></body></html>";
+		return "<html><head><title>REST Web Service</title></head><body><p>REST Web Service for PASSI Application is running nice and smooth :)</p></body></html>";
 	}
 
 	@RequestMapping(value = "/student/{username}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -39,13 +39,12 @@ public class PassiRestController {
 		return new ResponseEntity<Student>(student, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/worksheet/{group}/{username}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/worksheet/{group}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Worksheet> getWorksheet(
-			@PathVariable("group") String groupID,
-			@PathVariable("username") String username) {
-		System.out.println("Fetching worksheet with groupID = " + groupID + " and username = " + username);
-		Worksheet ws = userService.getWorksheet(groupID, username);
-		if (ws == null) throw new WorksheetNotFoundException(groupID, username);
+			@PathVariable("group") String groupID) {
+		System.out.println("Fetching worksheet with group ID = " + groupID);
+		Worksheet ws = userService.getWorksheet(groupID);
+		if (ws == null) throw new WorksheetNotFoundException(groupID);
 		return new ResponseEntity<Worksheet>(ws, HttpStatus.OK);
 	}
 	
@@ -62,8 +61,7 @@ public class PassiRestController {
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public Error worksheetNotFound(WorksheetNotFoundException e) {
 		String group = e.getGroupID();
-		String username = e.getUsername();
-		return new Error("Worksheet for student [" + username + "] member of group [" + group + "] not found");
+		return new Error("Worksheet for the group [" + group + "] not found");
 	}
 	
 	/* Use UriComponentBuilder to return resource URI for example when storing image on server

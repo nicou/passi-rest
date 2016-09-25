@@ -9,5 +9,5 @@ import fi.softala.ttl.model.Worksheet;
 public interface PassiDAO {
 	
 	public Student getStudent(String username);
-	public Worksheet getWorksheet(String groupID, String username);
+	public Worksheet getWorksheet(String groupID);
 }

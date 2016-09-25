@@ -10,30 +10,38 @@ public class Worksheet implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	private int worksheetID;
 	private String header;
 	private String preface;
 	private String planning;
 	private ArrayList<Waypoint> waypoints;
-	private String instructorComment;
 	
 	public Worksheet() {
 		super();
+		worksheetID = 0;
 		header = "";
 		preface = "";
 		planning = "";
 		waypoints = null;
-		instructorComment = "";
 	}
 
-	public Worksheet(String header, String preface, String planning, ArrayList<Waypoint> waypoints) {
+	public Worksheet(int worksheetID, String header, String preface, String planning, ArrayList<Waypoint> waypoints) {
 		super();
+		this.worksheetID = worksheetID;
 		this.header = header;
 		this.preface = preface;
 		this.planning = planning;
 		this.waypoints = waypoints;
-		this.instructorComment = "";
 	}
 
+	public int getWorksheetID() {
+		return worksheetID;
+	}
+
+	public void setWorksheetID(int worksheetID) {
+		this.worksheetID = worksheetID;
+	}
+	
 	public String getHeader() {
 		return header;
 	}
@@ -64,13 +72,5 @@ public class Worksheet implements Serializable {
 
 	public void setWaypoints(ArrayList<Waypoint> waypoints) {
 		this.waypoints = waypoints;
-	}
-
-	public String getInstructorComment() {
-		return instructorComment;
-	}
-
-	public void setInstructorComment(String instructorComment) {
-		this.instructorComment = instructorComment;
 	}
 }

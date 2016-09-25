@@ -12,15 +12,13 @@ public class Waypoint implements Serializable {
 
 	private int waypointID;
 	private String assignment;
-	private ArrayList<AnswerOption> answerOptions; 
-	private String instructorComment;
+	private ArrayList<AnswerOption> answerOptions;
 	
 	public Waypoint() {
 		super();
 		this.waypointID = 0;
 		this.assignment = "";
 		this.answerOptions = null;
-		this.instructorComment = "";
 	}
 
 	public Waypoint(int waypointID, String assignment, ArrayList<AnswerOption> answerOptions) {
@@ -28,7 +26,6 @@ public class Waypoint implements Serializable {
 		this.waypointID = waypointID;
 		this.assignment = assignment;
 		this.answerOptions = answerOptions;
-		this.instructorComment = "";
 	}
 
 	public int getWaypointID() {
@@ -53,13 +50,5 @@ public class Waypoint implements Serializable {
 
 	public void setAnswerOptions(ArrayList<AnswerOption> answerOptions) {
 		this.answerOptions = answerOptions;
-	}
-
-	public String getInstructorComment() {
-		return instructorComment;
-	}
-
-	public void setInstructorComment(String instructorComment) {
-		this.instructorComment = instructorComment;
 	}
 }

@@ -30,9 +30,9 @@ public class UserServiceImpl implements UserService{
 		return student;
 	}
 	
-	public Worksheet getWorksheet(String groupID, String username) {
+	public Worksheet getWorksheet(String groupID) {
 		Worksheet ws = new Worksheet();
-		ws = dao.getWorksheet(groupID, username);
+		ws = dao.getWorksheet(groupID);
 		return ws;
 	}
 	

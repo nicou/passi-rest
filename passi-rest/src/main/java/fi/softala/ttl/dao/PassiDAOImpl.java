@@ -15,9 +15,11 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
+import fi.softala.ttl.model.AnswerOption;
 import fi.softala.ttl.model.Group;
 import fi.softala.ttl.model.Instructor;
 import fi.softala.ttl.model.Student;
+import fi.softala.ttl.model.Waypoint;
 import fi.softala.ttl.model.Worksheet;
 
 @Component
@@ -54,9 +56,9 @@ public class PassiDAOImpl implements PassiDAO {
 	            return null;
 	        }
 	    });
-		if (student == null) {
-			return null;
-		}		
+		
+		if (student == null) return null;
+		
 		String sql2 = "SELECT ryh.ryhma_tunnus, ryh.ryhma_nimi, ope.username, ope.ope_etu, "
 				+ "ope.ope_suku, ope.ope_email, kou.koulu FROM ryhma_opi AS opi "
 				+ "JOIN ryhma AS ryh ON opi.ryhma_tunnus = ryh.ryhma_tunnus "
@@ -86,9 +88,68 @@ public class PassiDAOImpl implements PassiDAO {
 		return student;
 	}
 
-	public Worksheet getWorksheet(String groupID, String username) {
-
-		return null;
+	public Worksheet getWorksheet(String groupID) {
+		Worksheet worksheet = new Worksheet();
+		String sql1 = "SELECT teh.tk_id, teh.tk_otsikko, teh.tk_johdanto, teh.tk_suunnitelma FROM ryhma_tk AS rtk "
+				+ "JOIN tehtavakortti AS teh ON rtk.tk_id = teh.tk_id WHERE rtk.ryhma_tunnus = ?";
+		worksheet = jdbcTemplate.query(sql1, new Object[] {groupID}, new ResultSetExtractor<Worksheet>() {
+			 
+	        @Override
+	        public Worksheet extractData(ResultSet rs) throws SQLException, DataAccessException {
+	            if (rs.next()) {
+	            	Worksheet worksheet = new Worksheet();
+	            	worksheet.setWorksheetID(rs.getInt("tk_id"));
+	            	worksheet.setHeader(rs.getString("tk_otsikko"));
+	            	worksheet.setPreface(rs.getString("tk_johdanto"));
+	            	worksheet.setPlanning(rs.getString("tk_suunnitelma"));
+	                return worksheet;
+	            }
+	            return null;
+	        }
+	    });
+		
+		if (worksheet == null) return null;
+		
+		// List of waypoints
+		ArrayList<Waypoint> waypoints = new ArrayList<>();
+		String sql2 = "SELECT eta.etappi_id, eta.etappi_tehtava FROM ryhma_tk AS rtk "
+				+ "JOIN tehtavakortti AS teh ON rtk.tk_id = teh.tk_id "
+				+ "JOIN etappi AS eta ON eta.tk_id = teh.tk_id "
+				+ "WHERE rtk.ryhma_tunnus = ?";
+		waypoints = (ArrayList<Waypoint>) jdbcTemplate.query(sql2, new Object[] {groupID}, new RowMapper<Waypoint>() {
+			
+			@Override
+			public Waypoint mapRow(ResultSet rs, int rowNum) throws SQLException {
+				Waypoint waypoint = new Waypoint();
+				waypoint.setWaypointID(rs.getInt("etappi_id"));
+				waypoint.setAssignment(rs.getString("etappi_tehtava"));
+				return waypoint;
+			}
+		});
+		
+		if (waypoints == null) return null;
+		
+		// List of answer options
+		String sql3 = "SELECT val.valinta_id, val.valinta_text FROM etappi AS eta "
+				+ "JOIN valinta AS val ON val.etappi_id = eta.etappi_id "
+				+ "WHERE eta.etappi_id = ?";
+		for (Waypoint wp : waypoints) {
+			ArrayList<AnswerOption> answerOptions = new ArrayList<>();
+			answerOptions = (ArrayList<AnswerOption>) jdbcTemplate.query(sql3, new Object[] {wp.getWaypointID()}, new RowMapper<AnswerOption>() {
+				
+				@Override
+				public AnswerOption mapRow(ResultSet rs, int rowNum) throws SQLException {
+					AnswerOption answerOption = new AnswerOption();
+					answerOption.setOptionID(rs.getInt("valinta_id"));
+					answerOption.setOptionText(rs.getString("valinta_text"));
+					return answerOption;
+				}
+			});
+			wp.setAnswerOptions(answerOptions);
+		}
+		worksheet.setWaypoints(waypoints);
+		
+		return worksheet;
 	}
 
 	/*

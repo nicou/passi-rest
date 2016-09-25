@@ -7,7 +7,7 @@ public interface UserService {
 	
 	public Student findStudentByUsername(String username);
 	
-	public Worksheet getWorksheet(String groupID, String username);
+	public Worksheet getWorksheet(String groupID);
 	
 	/*
 	User findById(long id);
