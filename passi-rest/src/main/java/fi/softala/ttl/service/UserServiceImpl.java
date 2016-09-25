@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import fi.softala.ttl.dao.PassiDAO;
 import fi.softala.ttl.model.Student;
 import fi.softala.ttl.model.User;
+import fi.softala.ttl.model.WorksheetDTO;
 
 @Service("userService")
 @Transactional
@@ -41,6 +42,12 @@ public class UserServiceImpl implements UserService{
 		Student student = new Student();
 		student = dao.getStudent(username);
 		return student;
+	}
+	
+	public WorksheetDTO getWorksheetByGroupAndUsername(String groupID, String username) {
+		WorksheetDTO ws = new WorksheetDTO();
+		ws = dao.getWorksheetByGroupAndUsername(groupID, username);
+		return ws;
 	}
 
 	public List<User> findAllUsers() {

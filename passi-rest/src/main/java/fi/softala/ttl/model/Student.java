@@ -21,23 +21,17 @@ public class Student implements Serializable {
 		this.lastname = "";
 		this.school = "";
 		this.email = "";
+		this.groups = null;
 	}
 
-	public Student(String username, String firstname, String lastname, String school, String email) {
+	public Student(String username, String firstname, String lastname, String school, String email, ArrayList<Group> groups) {
 		super();
 		this.username = username;
 		this.firstname = firstname;
 		this.lastname = lastname;
 		this.school = school;
 		this.email = email;
-	}
-	
-	public void reset() {
-		this.username = "";
-		this.firstname = "";
-		this.lastname = "";
-		this.school = "";
-		this.email = "";
+		this.groups = groups;
 	}
 
 	public String getUsername() {
@@ -86,5 +80,11 @@ public class Student implements Serializable {
 
 	public void setGroups(ArrayList<Group> groups) {
 		this.groups = groups;
+	}
+
+	@Override
+	public String toString() {
+		return "Student [username=" + username + ", firstname=" + firstname + ", lastname=" + lastname + ", school="
+				+ school + ", email=" + email + ", groups=" + groups + "]";
 	}
 }

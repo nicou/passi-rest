@@ -4,10 +4,13 @@ import java.util.List;
 
 import fi.softala.ttl.model.Student;
 import fi.softala.ttl.model.User;
+import fi.softala.ttl.model.WorksheetDTO;
 
 public interface UserService {
 	
-	Student findStudentByUsername(String username);
+	public Student findStudentByUsername(String username);
+	
+	public WorksheetDTO getWorksheetByGroupAndUsername(String groupID, String username);
 	
 	User findById(long id);
 	

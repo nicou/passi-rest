@@ -9,29 +9,29 @@ public class Group implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private int groupID;
+	private String groupID;
 	private String groupName;
-	private int instructorID;
+	private String instructorID;
 	
 	public Group() {
 		super();
-		this.groupID = 0;
+		this.groupID = "";
 		this.groupName = "";
-		this.instructorID = 0;
+		this.instructorID = "";
 	}
 
-	public Group(int groupID, String groupName, int instructorID) {
+	public Group(String groupID, String groupName, String instructorID) {
 		super();
 		this.groupID = groupID;
 		this.groupName = groupName;
 		this.instructorID = instructorID;
 	}
 
-	public int getGroupID() {
+	public String getGroupID() {
 		return groupID;
 	}
 
-	public void setGroupID(int groupID) {
+	public void setGroupID(String groupID) {
 		this.groupID = groupID;
 	}
 
@@ -43,11 +43,16 @@ public class Group implements Serializable {
 		this.groupName = groupName;
 	}
 
-	public int getInstructorID() {
+	public String getInstructorID() {
 		return instructorID;
 	}
 
-	public void setInstructorID(int instructorID) {
+	public void setInstructorID(String instructorID) {
 		this.instructorID = instructorID;
+	}
+
+	@Override
+	public String toString() {
+		return "Group [groupID=" + groupID + ", groupName=" + groupName + ", instructorID=" + instructorID + "]";
 	}	
 }

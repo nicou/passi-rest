@@ -9,15 +9,30 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @Configuration
 @EnableWebMvc
 @ComponentScan(basePackages = "fi.softala.ttl.*")
 @PropertySource("classpath:data.properties")
-public class ApplicationConfiguration {
+public class ApplicationConfiguration extends WebMvcConfigurerAdapter {
 	
 	@Autowired
 	private Environment env;
+	
+	/*
+	@Override
+	public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+		configurer.defaultContentType(MediaType.APPLICATION_JSON);
+	}
+	
+	@Bean
+	public ViewResolver cnViewResolver(ContentNegotiationManager cnm) {
+		ContentNegotiatingViewResolver cnvr = new ContentNegotiatingViewResolver();
+		cnvr.setContentNegotiationManager(cnm);
+		return cnvr;
+	}
+	*/
 	
 	@Bean(name = "dataSource")
 	public BasicDataSource dataSource() {
