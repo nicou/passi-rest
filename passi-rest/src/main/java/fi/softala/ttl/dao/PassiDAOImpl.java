@@ -16,8 +16,9 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import fi.softala.ttl.model.Group;
+import fi.softala.ttl.model.Instructor;
 import fi.softala.ttl.model.Student;
-import fi.softala.ttl.model.WorksheetDTO;
+import fi.softala.ttl.model.Worksheet;
 
 @Component
 public class PassiDAOImpl implements PassiDAO {
@@ -55,10 +56,14 @@ public class PassiDAOImpl implements PassiDAO {
 	    });
 		if (student == null) {
 			return null;
-		}
-		String sql2 = "SELECT ryh.ryhma_tunnus, ryh.ryhma_nimi, ope.username FROM ryhma_opi AS opi "
+		}		
+		String sql2 = "SELECT ryh.ryhma_tunnus, ryh.ryhma_nimi, ope.username, ope.ope_etu, "
+				+ "ope.ope_suku, ope.ope_email, kou.koulu FROM ryhma_opi AS opi "
 				+ "JOIN ryhma AS ryh ON opi.ryhma_tunnus = ryh.ryhma_tunnus "
-				+ "JOIN ryhma_ope AS ope ON ope.ryhma_tunnus = ryh.ryhma_tunnus WHERE opi.username = ?";
+				+ "JOIN ryhma_ope AS rop ON rop.ryhma_tunnus = ryh.ryhma_tunnus "
+				+ "JOIN ope AS ope ON rop.username = ope.username "
+				+ "JOIN koulu AS kou ON ope.koulu_id = kou.koulu_id "
+				+ "WHERE opi.username = ?";
 		ArrayList<Group> groups = new ArrayList<>();
 		groups = (ArrayList<Group>) jdbcTemplate.query(sql2, new Object[] {username}, new RowMapper<Group>() {
 			
@@ -67,7 +72,13 @@ public class PassiDAOImpl implements PassiDAO {
 				Group group = new Group();
 				group.setGroupID(rs.getString("ryhma_tunnus"));
 				group.setGroupName(rs.getString("ryhma_nimi"));
-				group.setInstructorID(rs.getString("username"));
+				Instructor instructor = new Instructor();
+				instructor.setUsername(rs.getString("username"));
+				instructor.setFirstanme(rs.getString("ope_etu"));
+				instructor.setLastname(rs.getString("ope_suku"));
+				instructor.setEmail(rs.getString("ope_email"));
+				instructor.setSchool(rs.getString("koulu"));
+				group.setInstructor(instructor);
 				return group;
 			}
 		});
@@ -75,7 +86,7 @@ public class PassiDAOImpl implements PassiDAO {
 		return student;
 	}
 
-	public WorksheetDTO getWorksheetByGroupAndUsername(String groupID, String username) {
+	public Worksheet getWorksheet(String groupID, String username) {
 
 		return null;
 	}

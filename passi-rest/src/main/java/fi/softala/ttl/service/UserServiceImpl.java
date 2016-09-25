@@ -1,10 +1,5 @@
 package fi.softala.ttl.service;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
-
 import javax.inject.Inject;
 
 import org.springframework.stereotype.Service;
@@ -12,8 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import fi.softala.ttl.dao.PassiDAO;
 import fi.softala.ttl.model.Student;
-import fi.softala.ttl.model.User;
-import fi.softala.ttl.model.WorksheetDTO;
+import fi.softala.ttl.model.Worksheet;
 
 @Service("userService")
 @Transactional
@@ -30,6 +24,19 @@ public class UserServiceImpl implements UserService{
 		this.dao = dao;
 	}
 	
+	public Student findStudentByUsername(String username) {
+		Student student = new Student();
+		student = dao.getStudent(username);
+		return student;
+	}
+	
+	public Worksheet getWorksheet(String groupID, String username) {
+		Worksheet ws = new Worksheet();
+		ws = dao.getWorksheet(groupID, username);
+		return ws;
+	}
+	
+	/*
 	private static final AtomicLong counter = new AtomicLong();
 	
 	private static List<User> users;
@@ -37,19 +44,9 @@ public class UserServiceImpl implements UserService{
 	static {
 		users = populateDummyUsers();
 	}
+	*/
 	
-	public Student findStudentByUsername(String username) {
-		Student student = new Student();
-		student = dao.getStudent(username);
-		return student;
-	}
-	
-	public WorksheetDTO getWorksheetByGroupAndUsername(String groupID, String username) {
-		WorksheetDTO ws = new WorksheetDTO();
-		ws = dao.getWorksheetByGroupAndUsername(groupID, username);
-		return ws;
-	}
-
+	/*
 	public List<User> findAllUsers() {
 		return users;
 	}
@@ -104,4 +101,5 @@ public class UserServiceImpl implements UserService{
 		users.add(new User(counter.incrementAndGet(), "admin", "passw"));
 		return users;
 	}
+	*/
 }

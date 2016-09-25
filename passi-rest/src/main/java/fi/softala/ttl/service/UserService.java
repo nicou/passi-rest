@@ -1,17 +1,15 @@
 package fi.softala.ttl.service;
 
-import java.util.List;
-
 import fi.softala.ttl.model.Student;
-import fi.softala.ttl.model.User;
-import fi.softala.ttl.model.WorksheetDTO;
+import fi.softala.ttl.model.Worksheet;
 
 public interface UserService {
 	
 	public Student findStudentByUsername(String username);
 	
-	public WorksheetDTO getWorksheetByGroupAndUsername(String groupID, String username);
+	public Worksheet getWorksheet(String groupID, String username);
 	
+	/*
 	User findById(long id);
 	
 	User findByName(String name);
@@ -27,5 +25,5 @@ public interface UserService {
 	void deleteAllUsers();
 	
 	public boolean isUserExist(User user);
-	
+	*/
 }
