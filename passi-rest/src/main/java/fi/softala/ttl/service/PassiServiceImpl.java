@@ -9,9 +9,9 @@ import fi.softala.ttl.dao.PassiDAO;
 import fi.softala.ttl.model.Student;
 import fi.softala.ttl.model.Worksheet;
 
-@Service("userService")
+@Service("passiService")
 @Transactional
-public class UserServiceImpl implements UserService{
+public class PassiServiceImpl implements PassiService{
 	
 	@Inject
 	private PassiDAO dao;

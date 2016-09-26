@@ -3,7 +3,7 @@ package fi.softala.ttl.service;
 import fi.softala.ttl.model.Student;
 import fi.softala.ttl.model.Worksheet;
 
-public interface UserService {
+public interface PassiService {
 	
 	public Student findStudentByUsername(String username);
 	

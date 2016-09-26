@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import fi.softala.ttl.model.Student;
 import fi.softala.ttl.model.Worksheet;
-import fi.softala.ttl.service.UserService;
+import fi.softala.ttl.service.PassiService;
 import fi.softala.ttl.exception.StudentNotFoundException;
 import fi.softala.ttl.exception.WorksheetNotFoundException;
 
@@ -24,7 +24,7 @@ import fi.softala.ttl.exception.WorksheetNotFoundException;
 public class PassiRestController {
 
 	@Autowired
-	UserService userService;
+	PassiService passiService;
 	
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String index() {
@@ -34,7 +34,7 @@ public class PassiRestController {
 	@RequestMapping(value = "/student/{username}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Student> getStudent(@PathVariable("username") String username) {
 		System.out.println("Fetching student with username = " + username);
-		Student student = userService.findStudentByUsername(username);
+		Student student = passiService.findStudentByUsername(username);
 		if (student == null) throw new StudentNotFoundException(username);
 		return new ResponseEntity<Student>(student, HttpStatus.OK);
 	}
@@ -43,7 +43,7 @@ public class PassiRestController {
 	public ResponseEntity<Worksheet> getWorksheet(
 			@PathVariable("group") String groupID) {
 		System.out.println("Fetching worksheet with group ID = " + groupID);
-		Worksheet ws = userService.getWorksheet(groupID);
+		Worksheet ws = passiService.getWorksheet(groupID);
 		if (ws == null) throw new WorksheetNotFoundException(groupID);
 		return new ResponseEntity<Worksheet>(ws, HttpStatus.OK);
 	}
@@ -85,7 +85,7 @@ public class PassiRestController {
 	/*
 	@RequestMapping(value = "/user/", method = RequestMethod.GET)
 	public ResponseEntity<List<User>> listAllUsers() {
-		List<User> users = userService.findAllUsers();
+		List<User> users = passiService.findAllUsers();
 		if (users.isEmpty()) {
 			return new ResponseEntity<List<User>>(HttpStatus.NO_CONTENT); // or HttpStatus.NOT_FOUND
 		}
@@ -95,11 +95,11 @@ public class PassiRestController {
 	@RequestMapping(value = "/user/", method = RequestMethod.POST)
 	public ResponseEntity<Void> createUser(@RequestBody User user, UriComponentsBuilder ucBuilder) {
 		System.out.println("Creating User " + user.getUsername());
-		if (userService.isUserExist(user)) {
+		if (passiService.isUserExist(user)) {
 			System.out.println("A User with name " + user.getUsername() + " already exist");
 			return new ResponseEntity<Void>(HttpStatus.CONFLICT);
 		}
-		userService.saveUser(user);
+		passiService.saveUser(user);
 		HttpHeaders headers = new HttpHeaders();
 		headers.setLocation(ucBuilder.path("/user/{id}").buildAndExpand(user.getId()).toUri());
 		return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
@@ -108,33 +108,33 @@ public class PassiRestController {
 	@RequestMapping(value = "/user/{id}", method = RequestMethod.PUT)
 	public ResponseEntity<User> updateUser(@PathVariable("id") long id, @RequestBody User user) {
 		System.out.println("Updating User " + id);
-		User currentUser = userService.findById(id);
+		User currentUser = passiService.findById(id);
 		if (currentUser == null) {
 			System.out.println("User with id " + id + " not found");
 			return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
 		}
 		currentUser.setUsername(user.getUsername());
 		currentUser.setPassword(user.getPassword());
-		userService.updateUser(currentUser);
+		passiService.updateUser(currentUser);
 		return new ResponseEntity<User>(currentUser, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/user/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity<User> deleteUser(@PathVariable("id") long id) {
 		System.out.println("Fetching & Deleting User with id " + id);
-		User user = userService.findById(id);
+		User user = passiService.findById(id);
 		if (user == null) {
 			System.out.println("Unable to delete. User with id " + id + " not found");
 			return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
 		}
-		userService.deleteUserById(id);
+		passiService.deleteUserById(id);
 		return new ResponseEntity<User>(HttpStatus.NO_CONTENT);
 	}
 	
 	@RequestMapping(value = "/user/", method = RequestMethod.DELETE)
 	public ResponseEntity<User> deleteAllUsers() {
 		System.out.println("Deleting All Users");
-		userService.deleteAllUsers();
+		passiService.deleteAllUsers();
 		return new ResponseEntity<User>(HttpStatus.NO_CONTENT);
 	}
 	*/
