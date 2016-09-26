@@ -3,6 +3,8 @@
  */
 package fi.softala.ttl.controller;
 
+import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,7 +20,7 @@ import fi.softala.ttl.model.Student;
 import fi.softala.ttl.model.Worksheet;
 import fi.softala.ttl.service.PassiService;
 import fi.softala.ttl.exception.StudentNotFoundException;
-import fi.softala.ttl.exception.WorksheetNotFoundException;
+import fi.softala.ttl.exception.WorksheetsNotFoundException;
 
 @RestController
 public class PassiRestController {
@@ -40,12 +42,12 @@ public class PassiRestController {
 	}
 	
 	@RequestMapping(value = "/worksheet/{group}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Worksheet> getWorksheet(
+	public ResponseEntity<ArrayList<Worksheet>> getWorksheet(
 			@PathVariable("group") String groupID) {
-		System.out.println("Fetching worksheet with group ID = " + groupID);
-		Worksheet ws = passiService.getWorksheet(groupID);
-		if (ws == null) throw new WorksheetNotFoundException(groupID);
-		return new ResponseEntity<Worksheet>(ws, HttpStatus.OK);
+		System.out.println("Fetching worksheets with group ID = " + groupID);
+		ArrayList<Worksheet> worksheets = passiService.getWorksheets(groupID);
+		if (worksheets == null) throw new WorksheetsNotFoundException(groupID);
+		return new ResponseEntity<ArrayList<Worksheet>>(worksheets, HttpStatus.OK);
 	}
 	
 	// Exception handling
@@ -57,9 +59,9 @@ public class PassiRestController {
 		return new Error("Student [" + username + "] not found");
 	}
 	
-	@ExceptionHandler(WorksheetNotFoundException.class)
+	@ExceptionHandler(WorksheetsNotFoundException.class)
 	@ResponseStatus(HttpStatus.NOT_FOUND)
-	public Error worksheetNotFound(WorksheetNotFoundException e) {
+	public Error worksheetNotFound(WorksheetsNotFoundException e) {
 		String group = e.getGroupID();
 		return new Error("Worksheet for the group [" + group + "] not found");
 	}

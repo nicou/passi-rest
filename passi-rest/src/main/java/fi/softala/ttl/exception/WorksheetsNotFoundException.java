@@ -1,12 +1,12 @@
 package fi.softala.ttl.exception;
 
-public class WorksheetNotFoundException extends RuntimeException {
+public class WorksheetsNotFoundException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 	
 	private String groupID;
 	
-	public WorksheetNotFoundException(String groupID) {
+	public WorksheetsNotFoundException(String groupID) {
 		this.groupID = groupID;
 	}
 	

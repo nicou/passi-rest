@@ -1,5 +1,7 @@
 package fi.softala.ttl.service;
 
+import java.util.ArrayList;
+
 import fi.softala.ttl.model.Student;
 import fi.softala.ttl.model.Worksheet;
 
@@ -7,7 +9,7 @@ public interface PassiService {
 	
 	public Student findStudentByUsername(String username);
 	
-	public Worksheet getWorksheet(String groupID);
+	public ArrayList<Worksheet> getWorksheets(String groupID);
 	
 	/*
 	User findById(long id);

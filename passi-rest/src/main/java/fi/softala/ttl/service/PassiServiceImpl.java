@@ -1,5 +1,7 @@
 package fi.softala.ttl.service;
 
+import java.util.ArrayList;
+
 import javax.inject.Inject;
 
 import org.springframework.stereotype.Service;
@@ -30,10 +32,10 @@ public class PassiServiceImpl implements PassiService{
 		return student;
 	}
 	
-	public Worksheet getWorksheet(String groupID) {
-		Worksheet ws = new Worksheet();
-		ws = dao.getWorksheet(groupID);
-		return ws;
+	public ArrayList<Worksheet> getWorksheets(String groupID) {
+		ArrayList<Worksheet> worksheets = new ArrayList<>();
+		worksheets = dao.getWorksheets(groupID);
+		return worksheets;
 	}
 	
 	/*
