@@ -30,7 +30,7 @@ public class PassiRestController {
 	
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String index() {
-		return "<html><head><title>REST Web Service</title></head><body><p>REST Web Service for PASSI Application is running nice and smooth :)</p></body></html>";
+		return "REST Web Service for Passi Application is running nice and smoothly!";
 	}
 
 	@RequestMapping(value = "/student/{username}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
