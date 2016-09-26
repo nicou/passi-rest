@@ -7,7 +7,7 @@ public class Instructor implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private String username;
-	private String firstanme;
+	private String firstname;
 	private String lastname;
 	private String email;
 	private String school;
@@ -15,7 +15,7 @@ public class Instructor implements Serializable {
 	public Instructor() {
 		super();
 		this.username = "";
-		this.firstanme = "";
+		this.firstname = "";
 		this.lastname = "";
 		this.email = "";
 		this.school = "";
@@ -24,7 +24,7 @@ public class Instructor implements Serializable {
 	public Instructor(String username, String firstanme, String lastname, String email, String school) {
 		super();
 		this.username = username;
-		this.firstanme = firstanme;
+		this.firstname = firstanme;
 		this.lastname = lastname;
 		this.email = email;
 		this.school = school;
@@ -39,11 +39,11 @@ public class Instructor implements Serializable {
 	}
 
 	public String getFirstanme() {
-		return firstanme;
+		return firstname;
 	}
 
 	public void setFirstanme(String firstanme) {
-		this.firstanme = firstanme;
+		this.firstname = firstanme;
 	}
 
 	public String getLastname() {
