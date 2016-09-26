@@ -38,12 +38,12 @@ public class Instructor implements Serializable {
 		this.username = username;
 	}
 
-	public String getFirstanme() {
+	public String getFirstname() {
 		return firstname;
 	}
 
-	public void setFirstanme(String firstanme) {
-		this.firstname = firstanme;
+	public void setFirstname(String firstname) {
+		this.firstname = firstname;
 	}
 
 	public String getLastname() {

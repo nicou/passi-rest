@@ -76,7 +76,7 @@ public class PassiDAOImpl implements PassiDAO {
 				group.setGroupName(rs.getString("ryhma_nimi"));
 				Instructor instructor = new Instructor();
 				instructor.setUsername(rs.getString("username"));
-				instructor.setFirstanme(rs.getString("ope_etu"));
+				instructor.setFirstname(rs.getString("ope_etu"));
 				instructor.setLastname(rs.getString("ope_suku"));
 				instructor.setEmail(rs.getString("ope_email"));
 				instructor.setSchool(rs.getString("koulu"));
