@@ -12,4 +12,5 @@ public interface PassiDAO {
 	
 	public Student getStudent(String username);
 	public ArrayList<Worksheet> getWorksheets(String groupID);
+	public boolean isAnswerExist(int worksheetID);
 }

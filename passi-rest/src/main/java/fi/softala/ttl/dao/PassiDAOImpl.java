@@ -152,4 +152,9 @@ public class PassiDAOImpl implements PassiDAO {
 
 		return worksheets;
 	}
+	
+	public boolean isAnswerExist(int worksheetID) {
+		
+		return true;
+	}
 }

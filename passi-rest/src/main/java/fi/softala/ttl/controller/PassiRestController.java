@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
 import fi.softala.ttl.model.Student;
 import fi.softala.ttl.model.Worksheet;
 import fi.softala.ttl.service.PassiService;
@@ -35,7 +34,6 @@ public class PassiRestController {
 
 	@RequestMapping(value = "/student/{username}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Student> getStudent(@PathVariable("username") String username) {
-		System.out.println("Fetching student with username = " + username);
 		Student student = passiService.findStudentByUsername(username);
 		if (student == null) throw new StudentNotFoundException(username);
 		return new ResponseEntity<Student>(student, HttpStatus.OK);
@@ -44,7 +42,6 @@ public class PassiRestController {
 	@RequestMapping(value = "/worksheet/{group}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ArrayList<Worksheet>> getWorksheet(
 			@PathVariable("group") String groupID) {
-		System.out.println("Fetching worksheets with group ID = " + groupID);
 		ArrayList<Worksheet> worksheets = passiService.getWorksheets(groupID);
 		if (worksheets == null) throw new WorksheetsNotFoundException(groupID);
 		return new ResponseEntity<ArrayList<Worksheet>>(worksheets, HttpStatus.OK);
@@ -63,7 +60,7 @@ public class PassiRestController {
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public Error worksheetNotFound(WorksheetsNotFoundException e) {
 		String group = e.getGroupID();
-		return new Error("Worksheet for the group [" + group + "] not found");
+		return new Error("Worksheets for the group [" + group + "] not found");
 	}
 	
 	/* Use UriComponentBuilder to return resource URI for example when storing image on server
@@ -82,9 +79,19 @@ public class PassiRestController {
 		ResponseEntity<Spittle> responseEntity = new ResponseEntity<Spittle>(spittle, headers, HttpStatus.CREATED);
 		return responseEntity;
 	}
-	*/
 	
-	/*
+	@RequestMapping(value = "/answer/", method = RequestMethod.POST)
+	public ResponseEntity<Void> saveAnswer(@RequestBody AnswerWorksheetDTO answer, UriComponentsBuilder ucBuilder) {
+		if (passiService.isAnswerExist(answer)) {
+			System.out.println("Student [" + answer.getUsername() + "] has already answered to the worksheet ID: " + answer.getAnswerWorksheetID());
+			return new ResponseEntity<Void>(HttpStatus.CONFLICT);
+		}
+		passiService.saveUser(user);
+		HttpHeaders headers = new HttpHeaders();
+		headers.setLocation(ucBuilder.path("/user/{id}").buildAndExpand(user.getId()).toUri());
+		return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
+	}
+	
 	@RequestMapping(value = "/user/", method = RequestMethod.GET)
 	public ResponseEntity<List<User>> listAllUsers() {
 		List<User> users = passiService.findAllUsers();
@@ -92,19 +99,6 @@ public class PassiRestController {
 			return new ResponseEntity<List<User>>(HttpStatus.NO_CONTENT); // or HttpStatus.NOT_FOUND
 		}
 		return new ResponseEntity<List<User>>(users, HttpStatus.OK);
-	}
-	
-	@RequestMapping(value = "/user/", method = RequestMethod.POST)
-	public ResponseEntity<Void> createUser(@RequestBody User user, UriComponentsBuilder ucBuilder) {
-		System.out.println("Creating User " + user.getUsername());
-		if (passiService.isUserExist(user)) {
-			System.out.println("A User with name " + user.getUsername() + " already exist");
-			return new ResponseEntity<Void>(HttpStatus.CONFLICT);
-		}
-		passiService.saveUser(user);
-		HttpHeaders headers = new HttpHeaders();
-		headers.setLocation(ucBuilder.path("/user/{id}").buildAndExpand(user.getId()).toUri());
-		return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
 	}
 	
 	@RequestMapping(value = "/user/{id}", method = RequestMethod.PUT)

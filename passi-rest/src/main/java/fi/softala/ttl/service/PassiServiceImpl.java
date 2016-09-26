@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import fi.softala.ttl.dao.PassiDAO;
+import fi.softala.ttl.model.AnswerWorksheetDTO;
 import fi.softala.ttl.model.Student;
 import fi.softala.ttl.model.Worksheet;
 
@@ -36,6 +37,10 @@ public class PassiServiceImpl implements PassiService{
 		ArrayList<Worksheet> worksheets = new ArrayList<>();
 		worksheets = dao.getWorksheets(groupID);
 		return worksheets;
+	}
+	
+	public boolean isAnswerExist(AnswerWorksheetDTO answer) {
+		return dao.isAnswerExist(answer.getWorksheetID());
 	}
 	
 	/*
@@ -90,10 +95,6 @@ public class PassiServiceImpl implements PassiService{
 		}
 	}
 
-	public boolean isUserExist(User user) {
-		return findByName(user.getUsername()) != null;
-	}
-	
 	public void deleteAllUsers(){
 		users.clear();
 	}
