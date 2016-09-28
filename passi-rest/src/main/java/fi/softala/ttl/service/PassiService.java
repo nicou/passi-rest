@@ -2,6 +2,7 @@ package fi.softala.ttl.service;
 
 import java.util.ArrayList;
 
+import fi.softala.ttl.model.AnswerWorksheetDTO;
 import fi.softala.ttl.model.Student;
 import fi.softala.ttl.model.Worksheet;
 
@@ -11,21 +12,11 @@ public interface PassiService {
 	
 	public ArrayList<Worksheet> getWorksheets(String groupID);
 	
-	/*
-	User findById(long id);
+	public boolean isAnswerExist(AnswerWorksheetDTO answer);
 	
-	User findByName(String name);
+	public boolean isAnswerExist(int worksheetID);
 	
-	void saveUser(User user);
+	public void saveAnswer(AnswerWorksheetDTO answer);
 	
-	void updateUser(User user);
-	
-	void deleteUserById(long id);
-
-	List<User> findAllUsers(); 
-	
-	void deleteAllUsers();
-	
-	public boolean isUserExist(User user);
-	*/
+	public boolean deleteAnswer(int worksheetID, String username);
 }

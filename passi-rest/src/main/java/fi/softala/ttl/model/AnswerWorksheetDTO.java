@@ -10,7 +10,7 @@ public class AnswerWorksheetDTO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private int answerWorksheetID;
+	private int answerID;
 	private int worksheetID;
 	private String username;
 	private String planningText;
@@ -19,20 +19,31 @@ public class AnswerWorksheetDTO implements Serializable {
 	
 	public AnswerWorksheetDTO() {
 		super();
-		this.answerWorksheetID = 0;
+		this.answerID = 0; // new answer
 		this.worksheetID = 0;
 		this.username = "";
 		this.planningText = "";
 		this.waypoints = null;
 		this.instructorComment = "";
 	}
-
-	public int getAnswerWorksheetID() {
-		return answerWorksheetID;
+	
+	public AnswerWorksheetDTO(int answerID, int worksheetID, String username, String planningText,
+			ArrayList<AnswerWaypointDTO> waypoints, String instructorComment) {
+		super();
+		this.answerID = answerID;
+		this.worksheetID = worksheetID;
+		this.username = username;
+		this.planningText = planningText;
+		this.waypoints = waypoints;
+		this.instructorComment = instructorComment;
 	}
 
-	public void setAnswerWorksheetID(int answerWorksheetID) {
-		this.answerWorksheetID = answerWorksheetID;
+	public int getAnswerID() {
+		return answerID;
+	}
+
+	public void setAnswerID(int answerID) {
+		this.answerID = answerID;
 	}
 
 	public int getWorksheetID() {

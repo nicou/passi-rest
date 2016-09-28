@@ -3,19 +3,33 @@
  */
 package fi.softala.ttl.dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 
 import javax.inject.Inject;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import fi.softala.ttl.model.AnswerOption;
+import fi.softala.ttl.model.AnswerWaypointDTO;
+import fi.softala.ttl.model.AnswerWorksheetDTO;
 import fi.softala.ttl.model.Group;
 import fi.softala.ttl.model.Instructor;
 import fi.softala.ttl.model.Student;
@@ -35,6 +49,9 @@ public class PassiDAOImpl implements PassiDAO {
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
+
+	@Autowired
+	private PlatformTransactionManager platformTransactionManager;
 
 	public Student getStudent(String username) {
 		Student student = new Student();
@@ -117,16 +134,16 @@ public class PassiDAOImpl implements PassiDAO {
 		ArrayList<Waypoint> waypoints = new ArrayList<>();
 		for (Worksheet worksheet : worksheets) {
 			waypoints = (ArrayList<Waypoint>) jdbcTemplate.query(sql2, new Object[] { worksheet.getWorksheetID() },
-				new RowMapper<Waypoint>() {
+					new RowMapper<Waypoint>() {
 
-					@Override
-					public Waypoint mapRow(ResultSet rs, int rowNum) throws SQLException {
-						Waypoint waypoint = new Waypoint();
-						waypoint.setWaypointID(rs.getInt("etappi_id"));
-						waypoint.setAssignment(rs.getString("etappi_tehtava"));
-						return waypoint;
-					}
-				});
+						@Override
+						public Waypoint mapRow(ResultSet rs, int rowNum) throws SQLException {
+							Waypoint waypoint = new Waypoint();
+							waypoint.setWaypointID(rs.getInt("etappi_id"));
+							waypoint.setAssignment(rs.getString("etappi_tehtava"));
+							return waypoint;
+						}
+					});
 			worksheet.setWaypoints(waypoints);
 		}
 
@@ -135,26 +152,96 @@ public class PassiDAOImpl implements PassiDAO {
 		ArrayList<AnswerOption> answerOptions = new ArrayList<>();
 		for (Worksheet worksheet : worksheets) {
 			for (Waypoint waypoint : worksheet.getWaypoints()) {
-				answerOptions = (ArrayList<AnswerOption>) jdbcTemplate.query(sql3, new Object[] {waypoint.getWaypointID()},
-					new RowMapper<AnswerOption>() {
+				answerOptions = (ArrayList<AnswerOption>) jdbcTemplate.query(sql3,
+						new Object[] { waypoint.getWaypointID() }, new RowMapper<AnswerOption>() {
 
-						@Override
-						public AnswerOption mapRow(ResultSet rs, int rowNum) throws SQLException {
-							AnswerOption answerOption = new AnswerOption();
-							answerOption.setOptionID(rs.getInt("valinta_id"));
-							answerOption.setOptionText(rs.getString("valinta_text"));
-							return answerOption;
-						}
-					});
+							@Override
+							public AnswerOption mapRow(ResultSet rs, int rowNum) throws SQLException {
+								AnswerOption answerOption = new AnswerOption();
+								answerOption.setOptionID(rs.getInt("valinta_id"));
+								answerOption.setOptionText(rs.getString("valinta_text"));
+								return answerOption;
+							}
+						});
 				waypoint.setAnswerOptions(answerOptions);
 			}
 		}
 
 		return worksheets;
 	}
-	
+
 	public boolean isAnswerExist(int worksheetID) {
-		
+		final String SQL = "SELECT EXISTS (SELECT 1 FROM vastaus WHERE tk_id = ?)";
+		int exists = jdbcTemplate.queryForObject(SQL, new Object[] { worksheetID }, Integer.class);
+		if (exists == 1) {
+			return true;
+		}
+		return false;
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	public void saveAnswer(final AnswerWorksheetDTO answer) {
+
+		final String SQL1 = "INSERT INTO vastaus (vastaus_id, username, tk_id, v_suunnitelma) VALUES (?, ?, ?, ?)";
+
+		KeyHolder keyHolder = new GeneratedKeyHolder();
+
+		// Execute query
+		jdbcTemplate.update(new PreparedStatementCreator() {
+
+			public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+				PreparedStatement ps = connection.prepareStatement(SQL1, new String[] { "vastaus_id" });
+				ps.setInt(1, Types.NULL);
+				ps.setString(2, answer.getUsername());
+				ps.setInt(3, answer.getWorksheetID());
+				ps.setString(4, answer.getPlanningText());
+				// Timestamp.valueOf(datetimeDB) => vastaus_aika
+				return ps;
+			}
+		}, keyHolder);
+
+		final int ID = keyHolder.getKey().intValue();
+		answer.setAnswerID(ID);
+
+		final String SQL2 = "INSERT INTO etappi_valinta (vastaus_id, etappi_id, valinta_id, tekstikentta, kuva_url) "
+				+ "VALUES (?, ?, ?, ?, ?)";
+
+		jdbcTemplate.batchUpdate(SQL2, new BatchPreparedStatementSetter() {
+
+			@Override
+			public void setValues(PreparedStatement ps, int i) throws SQLException {
+				AnswerWaypointDTO waypoint = answer.getWaypoints().get(i);
+				ps.setInt(1, ID);
+				ps.setInt(2, waypoint.getWaypointID());
+				ps.setInt(3, waypoint.getSelectedOptionID());
+				ps.setString(4, waypoint.getAnswerText());
+				ps.setString(5, waypoint.getImageURL());
+			}
+
+			@Override
+			public int getBatchSize() {
+				return answer.getWaypoints().size();
+			}
+		});
+	}
+
+	public boolean deleteAnswer(int worksheetID, String username) {
+		DefaultTransactionDefinition paramTransactionDefinition = new DefaultTransactionDefinition();
+		TransactionStatus status = platformTransactionManager.getTransaction(paramTransactionDefinition);
+		try {
+			// Delete related waypoints
+			final String SQL1 = "DELETE FROM etappi_valinta WHERE vastaus_id = "
+					+ "(SELECT vastaus_id FROM vastaus WHERE tk_id = ? AND username = ?)";
+			jdbcTemplate.update(SQL1, new Object[] { worksheetID, username });
+			// Delete related answer
+			final String SQL2 = "DELETE FROM vastaus WHERE tk_id = ? AND username = ?";
+			jdbcTemplate.update(SQL2, new Object[] { worksheetID, username });
+			// Commit transactions
+			platformTransactionManager.commit(status);
+		} catch (Exception e) {
+			platformTransactionManager.rollback(status);
+			return false;
+		}
 		return true;
 	}
 }
