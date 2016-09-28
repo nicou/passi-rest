@@ -3,9 +3,13 @@
  */
 package fi.softala.ttl.controller;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,8 +19,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import fi.softala.ttl.model.AnswerWorksheetDTO;
@@ -53,36 +59,98 @@ public class PassiRestController {
 	}
 	
 	@RequestMapping(value = "/answer/", method = RequestMethod.POST)
-	public ResponseEntity<Void> saveAnswer(
+	public ResponseEntity<String> saveAnswer(
 			@RequestBody AnswerWorksheetDTO answer,
+			@RequestParam(value = "name", required = false) String[] names,
+			@RequestParam(value = "file", required = false) MultipartFile[] files,
 			UriComponentsBuilder ucBuilder) {
+		String message = new String("");
 		if (passiService.isAnswerExist(answer)) {
-			System.out.println("Student [" + answer.getUsername() + "] has already answered to the worksheet ID: " + answer.getWorksheetID());
-			return new ResponseEntity<Void>(HttpStatus.CONFLICT);
+			message = "Student [" + answer.getUsername() + "] has already answered to the worksheet ID: " + answer.getWorksheetID();
+			return new ResponseEntity<String>(message, HttpStatus.CONFLICT);
+		}
+		if (files.length != names.length) {
+			message = "Mandatory file information missing";
+			return new ResponseEntity<String>(message, HttpStatus.BAD_REQUEST);
 		}
 		passiService.saveAnswer(answer);
+			
 		HttpHeaders headers = new HttpHeaders();
 		headers.setLocation(ucBuilder.path("/answer/{id}").buildAndExpand(answer.getAnswerID()).toUri());
-		return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
+		return new ResponseEntity<String>(headers, HttpStatus.CREATED);
 	}
 	
 	@RequestMapping(value = "/answer/{worksheet}/{username}", method = RequestMethod.DELETE)
-	public ResponseEntity<Void> deleteUser(
+	public ResponseEntity<String> deleteAnswer(
 			@PathVariable("worksheet") int worksheetID,
 			@PathVariable("username") String username) {
-		System.out.println("Fetching & Deleting answer for worksheet [" + worksheetID + "] made by student [" + username + "].");
+		String message = new String("");
 		if (!passiService.isAnswerExist(worksheetID)) {
-			System.out.println("Unable to delete. Answer for worksheet [" + worksheetID + "] made by student [" + username + "] not found.");
-			return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
+			message = "Deleting failed. Required answers not found.";
+			return new ResponseEntity<String>(message, HttpStatus.NOT_FOUND);
 		}
 		if (passiService.deleteAnswer(worksheetID, username)) {
-			return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+			message = "Answers successfully deleted.";
+			return new ResponseEntity<String>(message, HttpStatus.NO_CONTENT);
 		} else {
-			return new ResponseEntity<Void>(HttpStatus.EXPECTATION_FAILED);
+			message = "Deleting answers interrupted for unknown reason. All data restored.";
+			return new ResponseEntity<String>(message, HttpStatus.EXPECTATION_FAILED);
 		}		
 	}
 	
-	// Exception handling
+	/*
+	@RequestMapping(value="/upload/", method=RequestMethod.POST)
+    public @ResponseBody String singleSave(@RequestParam("file") MultipartFile file) {
+    	String fileName = null;
+    	if (!file.isEmpty()) {
+            try {
+                fileName = file.getOriginalFilename();
+                String rootPath = System.getProperty("catalina.home");
+                File dir = new File(rootPath + File.separator + fileName);
+                byte[] bytes = file.getBytes();
+                BufferedOutputStream buffStream = new BufferedOutputStream(new FileOutputStream(dir));
+                buffStream.write(bytes);
+                buffStream.close();
+                return "You have successfully uploaded " + fileName;
+            } catch (Exception e) {
+                return "You failed to upload " + fileName + ": " + e.getMessage();
+            }
+        } else {
+            return "Unable to upload. File is empty.";
+        }
+    }
+    */
+
+	@RequestMapping(value = "/upload/{file}", method = RequestMethod.POST, consumes = MediaType.IMAGE_JPEG_VALUE) // "image/jpeg"
+	public ResponseEntity<String> uploadFileHandler(
+			@PathVariable("file") String file,
+			HttpEntity<byte[]> requestEntity) {
+		String message = new String("");
+		if (!file.isEmpty()) {
+			try {
+				byte[] payload = requestEntity.getBody();
+				String rootPath = System.getProperty("catalina.home");
+				File dir = new File(rootPath + File.separator + "images");
+				if (!dir.exists()) {
+					dir.mkdirs();
+				}
+				File serverFile = new File(dir.getAbsolutePath() + File.separator + file + ".jpg");
+				BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+				stream.write(payload);
+				stream.close();
+				message = "You successfully uploaded file " + file;
+				return new ResponseEntity<String>(message, HttpStatus.OK);
+			} catch (Exception e) {
+				message = "You failed to upload file " + file;
+				return new ResponseEntity<String>(message, HttpStatus.BAD_REQUEST);
+			}
+		} else {
+			message = "You failed to upload " + file + " because the file was empty.";
+			return new ResponseEntity<String>(message, HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	// EXCEPTION HANDLING
 	
 	@ExceptionHandler(StudentNotFoundException.class)
 	@ResponseStatus(HttpStatus.NOT_FOUND)
@@ -97,6 +165,7 @@ public class PassiRestController {
 		String group = e.getGroupID();
 		return new Error("Worksheets for the group [" + group + "] not found");
 	}
+	
 	
 	/* Use UriComponentBuilder to return resource URI for example when storing image on server
 	
