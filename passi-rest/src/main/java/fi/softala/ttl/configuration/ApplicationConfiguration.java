@@ -21,20 +21,6 @@ public class ApplicationConfiguration extends WebMvcConfigurerAdapter {
 	@Autowired
 	private Environment env;
 	
-	/*
-	@Override
-	public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
-		configurer.defaultContentType(MediaType.APPLICATION_JSON);
-	}
-	
-	@Bean
-	public ViewResolver cnViewResolver(ContentNegotiationManager cnm) {
-		ContentNegotiatingViewResolver cnvr = new ContentNegotiatingViewResolver();
-		cnvr.setContentNegotiationManager(cnm);
-		return cnvr;
-	}
-	*/
-	
 	@Bean(name = "dataSource")
 	public BasicDataSource dataSource() {
 		BasicDataSource ds = new BasicDataSource();
@@ -53,12 +39,25 @@ public class ApplicationConfiguration extends WebMvcConfigurerAdapter {
 		jdbcTemplate.setResultsMapCaseInsensitive(true);
 		return jdbcTemplate;
 	}
-	
-	// Transaction manager bean definition
+
 	@Bean
 	public DataSourceTransactionManager dataSourceTransactionManager(BasicDataSource dataSource) {
 	    DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
 	    dataSourceTransactionManager.setDataSource(dataSource);
 	    return dataSourceTransactionManager;
 	}
+	
+	/*
+	@Override
+	public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+		configurer.defaultContentType(MediaType.APPLICATION_JSON);
+	}
+	
+	@Bean
+	public ViewResolver cnViewResolver(ContentNegotiationManager cnm) {
+		ContentNegotiatingViewResolver cnvr = new ContentNegotiatingViewResolver();
+		cnvr.setContentNegotiationManager(cnm);
+		return cnvr;
+	}
+	*/
 }

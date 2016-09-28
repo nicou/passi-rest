@@ -24,7 +24,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import fi.softala.ttl.model.AnswerOption;
@@ -179,7 +178,6 @@ public class PassiDAOImpl implements PassiDAO {
 		return false;
 	}
 
-	@Transactional(rollbackFor = Exception.class)
 	public void saveAnswer(final AnswerWorksheetDTO answer) {
 
 		final String SQL1 = "INSERT INTO vastaus (vastaus_id, username, tk_id, v_suunnitelma) VALUES (?, ?, ?, ?)";
