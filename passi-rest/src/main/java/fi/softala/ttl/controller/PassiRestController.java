@@ -19,10 +19,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import fi.softala.ttl.model.AnswerWorksheetDTO;
@@ -61,20 +59,13 @@ public class PassiRestController {
 	@RequestMapping(value = "/answer/", method = RequestMethod.POST)
 	public ResponseEntity<String> saveAnswer(
 			@RequestBody AnswerWorksheetDTO answer,
-			@RequestParam(value = "name", required = false) String[] names,
-			@RequestParam(value = "file", required = false) MultipartFile[] files,
 			UriComponentsBuilder ucBuilder) {
 		String message = new String("");
 		if (passiService.isAnswerExist(answer)) {
 			message = "Student [" + answer.getUsername() + "] has already answered to the worksheet ID: " + answer.getWorksheetID();
 			return new ResponseEntity<String>(message, HttpStatus.CONFLICT);
 		}
-		if (files.length != names.length) {
-			message = "Mandatory file information missing";
-			return new ResponseEntity<String>(message, HttpStatus.BAD_REQUEST);
-		}
 		passiService.saveAnswer(answer);
-			
 		HttpHeaders headers = new HttpHeaders();
 		headers.setLocation(ucBuilder.path("/answer/{id}").buildAndExpand(answer.getAnswerID()).toUri());
 		return new ResponseEntity<String>(headers, HttpStatus.CREATED);
