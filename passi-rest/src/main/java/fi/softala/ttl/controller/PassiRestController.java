@@ -67,7 +67,7 @@ public class PassiRestController {
 			UriComponentsBuilder ucBuilder) {
 		String message = new String("");
 		if (passiService.isAnswerExist(answer)) {
-			message = "Student [" + answer.getUsername() + "] has already answered to the worksheet ID: " + answer.getWorksheetID();
+			message = "Student [" + answer.getUsername() + "] has already answered to the worksheet [" + answer.getWorksheetID() + "].";
 			return new ResponseEntity<String>(message, HttpStatus.CONFLICT);
 		}
 		passiService.saveAnswer(answer);
