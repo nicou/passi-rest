@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import fi.softala.ttl.model.AnswerWorksheetDTO;
-import fi.softala.ttl.model.Student;
+import fi.softala.ttl.model.Member;
 import fi.softala.ttl.model.Worksheet;
 import fi.softala.ttl.service.PassiService;
 import fi.softala.ttl.exception.StudentNotFoundException;
@@ -42,10 +42,10 @@ public class PassiRestController {
 	}
 
 	@RequestMapping(value = "/student/{username}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Student> getStudent(@PathVariable("username") String username) {
-		Student student = passiService.findStudentByUsername(username);
-		if (student == null) throw new StudentNotFoundException(username);
-		return new ResponseEntity<Student>(student, HttpStatus.OK);
+	public ResponseEntity<Member> getStudent(@PathVariable("username") String username) {
+		Member member = passiService.findStudentByUsername(username);
+		if (member == null) throw new StudentNotFoundException(username);
+		return new ResponseEntity<Member>(member, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/worksheet/{group}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -62,7 +62,7 @@ public class PassiRestController {
 			UriComponentsBuilder ucBuilder) {
 		String message = new String("");
 		if (passiService.isAnswerExist(answer)) {
-			message = "Student [" + answer.getUsername() + "] has already answered to the worksheet ID: " + answer.getWorksheetID();
+			message = "Member [" + answer.getUsername() + "] has already answered to the worksheet ID: " + answer.getWorksheetID();
 			return new ResponseEntity<String>(message, HttpStatus.CONFLICT);
 		}
 		passiService.saveAnswer(answer);
@@ -147,7 +147,7 @@ public class PassiRestController {
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public Error studentNotFound(StudentNotFoundException e) {
 		String username = e.getStudentUsername();
-		return new Error("Student [" + username + "] not found");
+		return new Error("Member [" + username + "] not found");
 	}
 	
 	@ExceptionHandler(WorksheetsNotFoundException.class)

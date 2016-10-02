@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import fi.softala.ttl.dao.PassiDAO;
 import fi.softala.ttl.model.AnswerWorksheetDTO;
-import fi.softala.ttl.model.Student;
+import fi.softala.ttl.model.Member;
 import fi.softala.ttl.model.Worksheet;
 
 @Service("passiService")
@@ -27,10 +27,10 @@ public class PassiServiceImpl implements PassiService{
 		this.dao = dao;
 	}
 	
-	public Student findStudentByUsername(String username) {
-		Student student = new Student();
-		student = dao.getStudent(username);
-		return student;
+	public Member findStudentByUsername(String username) {
+		Member member = new Member();
+		member = dao.getStudent(username);
+		return member;
 	}
 	
 	public ArrayList<Worksheet> getWorksheets(String groupID) {

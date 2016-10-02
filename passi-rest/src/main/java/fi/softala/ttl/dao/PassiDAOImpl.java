@@ -31,7 +31,7 @@ import fi.softala.ttl.model.AnswerWaypointDTO;
 import fi.softala.ttl.model.AnswerWorksheetDTO;
 import fi.softala.ttl.model.Group;
 import fi.softala.ttl.model.Instructor;
-import fi.softala.ttl.model.Student;
+import fi.softala.ttl.model.Member;
 import fi.softala.ttl.model.Waypoint;
 import fi.softala.ttl.model.Worksheet;
 
@@ -52,28 +52,28 @@ public class PassiDAOImpl implements PassiDAO {
 	@Autowired
 	private PlatformTransactionManager platformTransactionManager;
 
-	public Student getStudent(String username) {
-		Student student = new Student();
+	public Member getStudent(String username) {
+		Member member = new Member();
 		String sql1 = "SELECT o.username, o.opi_etu, o.opi_suku, o.opi_email, k.koulu FROM opi AS o "
 				+ "JOIN koulu AS k ON o.koulu_id = k.koulu_id WHERE o.username = ?";
-		student = jdbcTemplate.query(sql1, new Object[] { username }, new ResultSetExtractor<Student>() {
+		member = jdbcTemplate.query(sql1, new Object[] { username }, new ResultSetExtractor<Member>() {
 
 			@Override
-			public Student extractData(ResultSet rs) throws SQLException, DataAccessException {
+			public Member extractData(ResultSet rs) throws SQLException, DataAccessException {
 				if (rs.next()) {
-					Student student = new Student();
-					student.setUsername(rs.getString("username"));
-					student.setFirstname(rs.getString("opi_etu"));
-					student.setLastname(rs.getString("opi_suku"));
-					student.setEmail(rs.getString("opi_email"));
-					student.setSchool(rs.getString("koulu"));
-					return student;
+					Member member = new Member();
+					member.setUsername(rs.getString("username"));
+					member.setFirstname(rs.getString("opi_etu"));
+					member.setLastname(rs.getString("opi_suku"));
+					member.setEmail(rs.getString("opi_email"));
+					member.setSchool(rs.getString("koulu"));
+					return member;
 				}
 				return null;
 			}
 		});
 
-		if (student == null)
+		if (member == null)
 			return null;
 
 		String sql2 = "SELECT ryh.ryhma_tunnus, ryh.ryhma_nimi, ope.username, ope.ope_etu, "
@@ -100,8 +100,8 @@ public class PassiDAOImpl implements PassiDAO {
 				return group;
 			}
 		});
-		student.setGroups(groups);
-		return student;
+		member.setGroups(groups);
+		return member;
 	}
 
 	public ArrayList<Worksheet> getWorksheets(String groupID) {

@@ -3,7 +3,7 @@ package fi.softala.ttl.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Student implements Serializable {
+public class Member implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -14,7 +14,7 @@ public class Student implements Serializable {
 	private String email;
 	private ArrayList<Group> groups;
 	
-	public Student() {
+	public Member() {
 		super();
 		this.username = "";
 		this.firstname = "";
@@ -24,7 +24,7 @@ public class Student implements Serializable {
 		this.groups = null;
 	}
 
-	public Student(String username, String firstname, String lastname, String school, String email, ArrayList<Group> groups) {
+	public Member(String username, String firstname, String lastname, String school, String email, ArrayList<Group> groups) {
 		super();
 		this.username = username;
 		this.firstname = firstname;
@@ -84,7 +84,7 @@ public class Student implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Student [username=" + username + ", firstname=" + firstname + ", lastname=" + lastname + ", school="
+		return "Member [username=" + username + ", firstname=" + firstname + ", lastname=" + lastname + ", school="
 				+ school + ", email=" + email + ", groups=" + groups + "]";
 	}
 }
