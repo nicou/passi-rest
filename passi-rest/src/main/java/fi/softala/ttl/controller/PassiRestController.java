@@ -132,7 +132,6 @@ public class PassiRestController {
 	public Error studentNotFound(StudentNotFoundException e) {
 		String username = e.getStudentUsername();
 		return new Error("Member [" + username + "] not found");
-		return new Error("Student [" + username + "] not found.");
 	}
 	
 	@ExceptionHandler(WorksheetsNotFoundException.class)
