@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -26,12 +26,12 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
-import fi.softala.ttl.model.AnswerOption;
+import fi.softala.ttl.model.Option;
 import fi.softala.ttl.model.AnswerWaypointDTO;
 import fi.softala.ttl.model.AnswerWorksheetDTO;
 import fi.softala.ttl.model.Group;
 import fi.softala.ttl.model.Instructor;
-import fi.softala.ttl.model.Student;
+import fi.softala.ttl.model.User;
 import fi.softala.ttl.model.Waypoint;
 import fi.softala.ttl.model.Worksheet;
 
@@ -52,117 +52,133 @@ public class PassiDAOImpl implements PassiDAO {
 	@Autowired
 	private PlatformTransactionManager platformTransactionManager;
 
-	public Student getStudent(String username) {
-		Student student = new Student();
-		String sql1 = "SELECT o.username, o.opi_etu, o.opi_suku, o.opi_email, k.koulu FROM opi AS o "
-				+ "JOIN koulu AS k ON o.koulu_id = k.koulu_id WHERE o.username = ?";
-		student = jdbcTemplate.query(sql1, new Object[] { username }, new ResultSetExtractor<Student>() {
+	public User findUser(String username) {
+		
+		final String SQL1 = "SELECT user_id, username, firstname, lastname, email, phone FROM users WHERE username = ?";
+		
+		User user = jdbcTemplate.query(SQL1, new Object[] { username }, new ResultSetExtractor<User>() {
 
 			@Override
-			public Student extractData(ResultSet rs) throws SQLException, DataAccessException {
+			public User extractData(ResultSet rs) throws SQLException, DataAccessException {
 				if (rs.next()) {
-					Student student = new Student();
-					student.setUsername(rs.getString("username"));
-					student.setFirstname(rs.getString("opi_etu"));
-					student.setLastname(rs.getString("opi_suku"));
-					student.setEmail(rs.getString("opi_email"));
-					student.setSchool(rs.getString("koulu"));
-					return student;
+					User user = new User();
+					user.setUserID(rs.getInt("user_id"));
+					user.setUsername(rs.getString("username"));
+					user.setFirstname(rs.getString("firstname"));
+					user.setLastname(rs.getString("lastname"));
+					user.setEmail(rs.getString("email"));
+					user.setPhone(rs.getString("phone"));
+					return user;
 				}
 				return null;
 			}
 		});
-
-		if (student == null)
+		
+		if (user == null) {
 			return null;
-
-		String sql2 = "SELECT ryh.ryhma_tunnus, ryh.ryhma_nimi, ope.username, ope.ope_etu, "
-				+ "ope.ope_suku, ope.ope_email, kou.koulu FROM ryhma_opi AS opi "
-				+ "JOIN ryhma AS ryh ON opi.ryhma_tunnus = ryh.ryhma_tunnus "
-				+ "JOIN ryhma_ope AS rop ON rop.ryhma_tunnus = ryh.ryhma_tunnus "
-				+ "JOIN ope AS ope ON rop.username = ope.username "
-				+ "JOIN koulu AS kou ON ope.koulu_id = kou.koulu_id " + "WHERE opi.username = ?";
-		ArrayList<Group> groups = new ArrayList<>();
-		groups = (ArrayList<Group>) jdbcTemplate.query(sql2, new Object[] { username }, new RowMapper<Group>() {
+		}
+		
+		final String SQL2 = "SELECT groups.group_id, groups.group_name FROM groups "
+				+ "JOIN members ON members.group_id = groups.group_id "
+				+ "JOIN users ON members.user_id = users.user_id "
+				+ "WHERE users.user_id = ?";
+		
+		List<Group> groups = jdbcTemplate.query(SQL2, new Object[] { user.getUserID() }, new RowMapper<Group>() {
 
 			@Override
 			public Group mapRow(ResultSet rs, int rowNum) throws SQLException {
 				Group group = new Group();
-				group.setGroupID(rs.getString("ryhma_tunnus"));
-				group.setGroupName(rs.getString("ryhma_nimi"));
-				Instructor instructor = new Instructor();
-				instructor.setUsername(rs.getString("username"));
-				instructor.setFirstname(rs.getString("ope_etu"));
-				instructor.setLastname(rs.getString("ope_suku"));
-				instructor.setEmail(rs.getString("ope_email"));
-				instructor.setSchool(rs.getString("koulu"));
-				group.setInstructor(instructor);
+				group.setGroupID(rs.getString("group_id"));
+				group.setGroupName(rs.getString("group_name"));
 				return group;
 			}
 		});
-		student.setGroups(groups);
-		return student;
+		
+		user.setGroups(groups);
+		
+		final String SQL3 = "SELECT users.user_id, users.firstname, users.lastname, users.email, users.phone FROM users "
+				+ "JOIN members ON members.user_id = users.user_id "
+				+ "WHERE users.role_id = 2 AND members.group_id = ?";
+		
+		for (Group group : user.getGroups()) {
+			List<Instructor> instructors = jdbcTemplate.query(SQL3, new Object[] { group.getGroupID() }, new RowMapper<Instructor>() {
+				
+				@Override
+				public Instructor mapRow(ResultSet rs, int rowNum) throws SQLException {
+					Instructor instructor = new Instructor();
+					instructor.setUserID(rs.getInt("user_id"));
+					instructor.setFirstname(rs.getString("firstname"));
+					instructor.setLastname(rs.getString("lastname"));
+					instructor.setEmail(rs.getString("email"));
+					instructor.setPhone(rs.getString("phone"));
+					return instructor;
+				}
+			});
+			group.setInstructors(instructors);
+		}
+		
+		return user;
 	}
 
-	public ArrayList<Worksheet> getWorksheets(String groupID) {
-		ArrayList<Worksheet> worksheets = new ArrayList<>();
+	public List<Worksheet> getWorksheets(int groupID) {
 
-		// Get worksheets by groupID
-		String sql1 = "SELECT teh.tk_id, teh.tk_nimi, teh.tk_johdanto, teh.tk_suunnitelma FROM ryhma_tk AS rtk "
-				+ "JOIN tehtavakortti AS teh ON rtk.tk_id = teh.tk_id WHERE rtk.ryhma_tunnus = ?";
-		worksheets = (ArrayList<Worksheet>) jdbcTemplate.query(sql1, new Object[] { groupID },
-				new RowMapper<Worksheet>() {
+		final String SQL1 = "SELECT worksheets.worksheet_id, worksheets.worksheet_header, "
+				+ "worksheets.worksheet_preface, worksheets.worksheet_planning FROM worksheets "
+				+ "JOIN distribution ON distribution.worksheet_id = worksheets.worksheet_id "
+				+ "WHERE distribution.group_id = ?";
+		
+		List<Worksheet> worksheets = jdbcTemplate.query(SQL1, new Object[] { groupID }, new RowMapper<Worksheet>() {
 
-					@Override
-					public Worksheet mapRow(ResultSet rs, int rowNum) throws SQLException {
-						Worksheet worksheet = new Worksheet();
-						worksheet.setWorksheetID(rs.getInt("tk_id"));
-						worksheet.setHeader(rs.getString("tk_nimi"));
-						worksheet.setPreface(rs.getString("tk_johdanto"));
-						worksheet.setPlanning(rs.getString("tk_suunnitelma"));
-						return worksheet;
-					}
-				});
+			@Override
+			public Worksheet mapRow(ResultSet rs, int rowNum) throws SQLException {
+				Worksheet worksheet = new Worksheet();
+				worksheet.setWorksheetID(rs.getInt("worksheet_id"));
+				worksheet.setHeader(rs.getString("worksheet_header"));
+				worksheet.setPreface(rs.getString("worksheet_preface"));
+				worksheet.setPlanning(rs.getString("worksheet_planning"));
+				return worksheet;
+			}
+		});
 
-		// Break and return if no worksheets
-		if (worksheets == null)
+		if (worksheets == null) {
 			return null;
-
-		// Add waypoints to worksheets
-		String sql2 = "SELECT eta.etappi_id, eta.etappi_tehtava FROM etappi AS eta WHERE eta.tk_id = ?";
-		ArrayList<Waypoint> waypoints = new ArrayList<>();
+		}
+		
+		final String SQL2 = "SELECT waypoint_id, waypoint_task, waypoint_photo_enabled FROM waypoints "
+				+ "WHERE worksheet_id = ?";
+		
+		List<Waypoint> waypoints = null;
 		for (Worksheet worksheet : worksheets) {
-			waypoints = (ArrayList<Waypoint>) jdbcTemplate.query(sql2, new Object[] { worksheet.getWorksheetID() },
-					new RowMapper<Waypoint>() {
+			waypoints = jdbcTemplate.query(SQL2, new Object[] { worksheet.getWorksheetID() }, new RowMapper<Waypoint>() {
 
-						@Override
-						public Waypoint mapRow(ResultSet rs, int rowNum) throws SQLException {
-							Waypoint waypoint = new Waypoint();
-							waypoint.setWaypointID(rs.getInt("etappi_id"));
-							waypoint.setAssignment(rs.getString("etappi_tehtava"));
-							return waypoint;
-						}
-					});
+				@Override
+				public Waypoint mapRow(ResultSet rs, int rowNum) throws SQLException {
+					Waypoint waypoint = new Waypoint();
+					waypoint.setWaypointID(rs.getInt("waypoint_id"));
+					waypoint.setWaypointTask(rs.getString("waypoint_task"));
+					waypoint.setWaypointPhotoEnabled(rs.getBoolean("waypoint_photo_enabled"));
+					return waypoint;
+				}
+			});
 			worksheet.setWaypoints(waypoints);
 		}
 
-		// Add answer options to waypoints
-		String sql3 = "SELECT val.valinta_id, val.valinta_text FROM valinta AS val WHERE val.etappi_id = ?";
-		ArrayList<AnswerOption> answerOptions = new ArrayList<>();
+		final String SQL3 = "SELECT option_id, option_text FROM options WHERE waypoint_id = ?";
+		
+		List<Option> options = null;
 		for (Worksheet worksheet : worksheets) {
 			for (Waypoint waypoint : worksheet.getWaypoints()) {
-				answerOptions = (ArrayList<AnswerOption>) jdbcTemplate.query(sql3,
-						new Object[] { waypoint.getWaypointID() }, new RowMapper<AnswerOption>() {
+				options = jdbcTemplate.query(SQL3, new Object[] { waypoint.getWaypointID() }, new RowMapper<Option>() {
 
-							@Override
-							public AnswerOption mapRow(ResultSet rs, int rowNum) throws SQLException {
-								AnswerOption answerOption = new AnswerOption();
-								answerOption.setOptionID(rs.getInt("valinta_id"));
-								answerOption.setOptionText(rs.getString("valinta_text"));
-								return answerOption;
-							}
-						});
-				waypoint.setAnswerOptions(answerOptions);
+					@Override
+					public Option mapRow(ResultSet rs, int rowNum) throws SQLException {
+						Option option = new Option();
+						option.setOptionID(rs.getInt("option_id"));
+						option.setOptionText(rs.getString("option_text"));
+						return option;
+					}
+				});
+				waypoint.setOptions(options);
 			}
 		}
 
@@ -170,7 +186,7 @@ public class PassiDAOImpl implements PassiDAO {
 	}
 
 	public boolean isAnswerExist(int worksheetID) {
-		final String SQL = "SELECT EXISTS (SELECT 1 FROM vastaus WHERE tk_id = ?)";
+		final String SQL = "SELECT EXISTS (SELECT 1 FROM answer WHERE worksheet_id = ?)";
 		int exists = jdbcTemplate.queryForObject(SQL, new Object[] { worksheetID }, Integer.class);
 		if (exists == 1) {
 			return true;

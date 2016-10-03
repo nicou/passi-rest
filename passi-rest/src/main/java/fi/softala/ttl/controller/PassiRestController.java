@@ -6,7 +6,7 @@ package fi.softala.ttl.controller;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +25,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import fi.softala.ttl.model.AnswerWorksheetDTO;
-import fi.softala.ttl.model.Student;
+import fi.softala.ttl.model.User;
 import fi.softala.ttl.model.Worksheet;
 import fi.softala.ttl.service.PassiService;
-import fi.softala.ttl.exception.StudentNotFoundException;
-import fi.softala.ttl.exception.WorksheetsNotFoundException;
+import fi.softala.ttl.exception.UserNotFoundException;
+import fi.softala.ttl.exception.WorksheetNotFoundException;
 
 @RestController
 public class PassiRestController {
@@ -37,27 +37,24 @@ public class PassiRestController {
 	@Autowired
 	PassiService passiService;
 	
-	// Application root message	
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String index() {
 		return "REST Web Service for Passi Application is running nice and smoothly!";
 	}
 
-	// Get student user data
-	@RequestMapping(value = "/student/{username}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Student> getStudent(@PathVariable("username") String username) {
-		Student student = passiService.findStudentByUsername(username);
-		if (student == null) throw new StudentNotFoundException(username);
-		return new ResponseEntity<Student>(student, HttpStatus.OK);
+	@RequestMapping(value = "/user/{username}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<User> getStudent(@PathVariable("username") String username) {
+		User user = passiService.findUser(username);
+		if (user == null) throw new UserNotFoundException(username);
+		return new ResponseEntity<User>(user, HttpStatus.OK);
 	}
 	
-	// Get group worksheet content
 	@RequestMapping(value = "/worksheet/{group}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<ArrayList<Worksheet>> getWorksheet(
-			@PathVariable("group") String groupID) {
-		ArrayList<Worksheet> worksheets = passiService.getWorksheets(groupID);
-		if (worksheets.size() == 0) throw new WorksheetsNotFoundException(groupID);
-		return new ResponseEntity<ArrayList<Worksheet>>(worksheets, HttpStatus.OK);
+	public ResponseEntity<List<Worksheet>> getWorksheet(
+			@PathVariable("group") int groupID) {
+		List<Worksheet> worksheets = passiService.getWorksheets(groupID);
+		if (worksheets.size() == 0) throw new WorksheetNotFoundException(groupID);
+		return new ResponseEntity<List<Worksheet>>(worksheets, HttpStatus.OK);
 	}
 	
 	// Save student answers
@@ -67,6 +64,7 @@ public class PassiRestController {
 			UriComponentsBuilder ucBuilder) {
 		String message = new String("");
 		if (passiService.isAnswerExist(answer)) {
+			message = "User [" + answer.getUsername() + "] has already answered to the worksheet ID: " + answer.getWorksheetID();
 			message = "Student [" + answer.getUsername() + "] has already answered to the worksheet [" + answer.getWorksheetID() + "].";
 			return new ResponseEntity<String>(message, HttpStatus.CONFLICT);
 		}
@@ -130,17 +128,17 @@ public class PassiRestController {
 	}
 	
 	// Exception handlers	
-	@ExceptionHandler(StudentNotFoundException.class)
+	@ExceptionHandler(UserNotFoundException.class)
 	@ResponseStatus(HttpStatus.NOT_FOUND)
-	public Error studentNotFound(StudentNotFoundException e) {
+	public Error studentNotFound(UserNotFoundException e) {
 		String username = e.getStudentUsername();
-		return new Error("Student [" + username + "] not found.");
+		return new Error("User [" + username + "] not found");
 	}
 	
-	@ExceptionHandler(WorksheetsNotFoundException.class)
+	@ExceptionHandler(WorksheetNotFoundException.class)
 	@ResponseStatus(HttpStatus.NOT_FOUND)
-	public Error worksheetNotFound(WorksheetsNotFoundException e) {
-		String group = e.getGroupID();
+	public Error worksheetNotFound(WorksheetNotFoundException e) {
+		int group = e.getGroupID();
 		return new Error("Worksheets for the group [" + group + "] not found.");
 	}
 	

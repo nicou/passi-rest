@@ -12,7 +12,7 @@ public class AnswerWaypointDTO implements Serializable {
 	private int answerWaypointID;
 	private int answerID; // => AnswerWorksheetDTO
 	private int waypointID;
-	private int selectedOptionID; // => AnswerOption
+	private int selectedOptionID; // => Option
 	private String imageURL;
 	private String answerText;
 	private String instructorComment;

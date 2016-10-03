@@ -1,16 +1,16 @@
 package fi.softala.ttl.service;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import fi.softala.ttl.model.AnswerWorksheetDTO;
-import fi.softala.ttl.model.Student;
+import fi.softala.ttl.model.User;
 import fi.softala.ttl.model.Worksheet;
 
 public interface PassiService {
 	
-	public Student findStudentByUsername(String username);
+	public User findUser(String username);
 	
-	public ArrayList<Worksheet> getWorksheets(String groupID);
+	public List<Worksheet> getWorksheets(int groupID);
 	
 	public boolean isAnswerExist(AnswerWorksheetDTO answer);
 	

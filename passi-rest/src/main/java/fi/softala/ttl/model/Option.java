@@ -5,20 +5,20 @@ package fi.softala.ttl.model;
 
 import java.io.Serializable;
 
-public class AnswerOption implements Serializable {
+public class Option implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
 	private int optionID;
 	private String optionText;
 	
-	public AnswerOption() {
+	public Option() {
 		super();
 		this.optionID = 0;
 		this.optionText = "";
 	}
 
-	public AnswerOption(int optionID, String optionText) {
+	public Option(int optionID, String optionText) {
 		super();
 		this.optionID = optionID;
 		this.optionText = optionText;

@@ -4,28 +4,31 @@
 package fi.softala.ttl.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.List;
 
 public class Waypoint implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private int waypointID;
-	private String assignment;
-	private ArrayList<AnswerOption> answerOptions;
+	private int     waypointID;
+	private String  waypointTask;
+	private boolean waypointPhotoEnabled;
+	
+	private List<Option> options;
 	
 	public Waypoint() {
 		super();
 		this.waypointID = 0;
-		this.assignment = "";
-		this.answerOptions = null;
+		this.waypointTask = "";
+		this.waypointPhotoEnabled = false;
+		this.options = null;
 	}
 
-	public Waypoint(int waypointID, String assignment, ArrayList<AnswerOption> answerOptions) {
+	public Waypoint(int waypointID, String waypointTask, List<Option> options) {
 		super();
 		this.waypointID = waypointID;
-		this.assignment = assignment;
-		this.answerOptions = answerOptions;
+		this.waypointTask = waypointTask;
+		this.options = options;
 	}
 
 	public int getWaypointID() {
@@ -36,19 +39,27 @@ public class Waypoint implements Serializable {
 		this.waypointID = waypointID;
 	}
 
-	public String getAssignment() {
-		return assignment;
+	public String getWaypointTask() {
+		return waypointTask;
 	}
 
-	public void setAssignment(String assignment) {
-		this.assignment = assignment;
+	public void setWaypointTask(String waypointTask) {
+		this.waypointTask = waypointTask;
 	}
 
-	public ArrayList<AnswerOption> getAnswerOptions() {
-		return answerOptions;
+	public boolean getWaypointPhotoEnabled() {
+		return waypointPhotoEnabled;
+	}
+	
+	public void setWaypointPhotoEnabled(boolean waypointPhotoEnabled) {
+		this.waypointPhotoEnabled = waypointPhotoEnabled;
+	}
+	
+	public List<Option> getOptions() {
+		return options;
 	}
 
-	public void setAnswerOptions(ArrayList<AnswerOption> answerOptions) {
-		this.answerOptions = answerOptions;
+	public void setOptions(List<Option> options) {
+		this.options = options;
 	}
 }
