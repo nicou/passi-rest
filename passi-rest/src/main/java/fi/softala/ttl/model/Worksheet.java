@@ -4,17 +4,18 @@
 package fi.softala.ttl.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.List;
 
 public class Worksheet implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private int worksheetID;
+	private int    worksheetID;
 	private String header;
 	private String preface;
 	private String planning;
-	private ArrayList<Waypoint> waypoints;
+	
+	private List<Waypoint> waypoints;
 	
 	public Worksheet() {
 		super();
@@ -25,7 +26,7 @@ public class Worksheet implements Serializable {
 		waypoints = null;
 	}
 
-	public Worksheet(int worksheetID, String header, String preface, String planning, ArrayList<Waypoint> waypoints) {
+	public Worksheet(int worksheetID, String header, String preface, String planning, List<Waypoint> waypoints) {
 		super();
 		this.worksheetID = worksheetID;
 		this.header = header;
@@ -66,11 +67,11 @@ public class Worksheet implements Serializable {
 		this.planning = planning;
 	}
 
-	public ArrayList<Waypoint> getWaypoints() {
+	public List<Waypoint> getWaypoints() {
 		return waypoints;
 	}
 
-	public void setWaypoints(ArrayList<Waypoint> waypoints) {
+	public void setWaypoints(List<Waypoint> waypoints) {
 		this.waypoints = waypoints;
 	}
 }

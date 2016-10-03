@@ -1,29 +1,52 @@
+/**
+ * @author Mika Ropponen
+ */
 package fi.softala.ttl.model;
 
-public class User {
+import java.io.Serializable;
+import java.util.List;
 
-	private long id;
+public class User implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	
+	private int    userID;
 	private String username;
+	private String firstname;
+	private String lastname;
+	private String email;
+	private String phone;
 	
-	private String password;
+	private List<Group> groups;
 
 	public User() {
-		id = 0;
-	}
-	
-	public User(long id, String username, String password) {
-		this.id = id;
-		this.username = username;
-		this.password = password;
-	}
-	
-	public long getId() {
-		return id;
+		super();
+		this.userID = 0;
+		this.username = "";
+		this.firstname = "";
+		this.lastname = "";
+		this.email = "";
+		this.phone = "";
 	}
 
-	public void setId(long id) {
-		this.id = id;
+	public User(int userID, String username, String firstname, String lastname, String email, String phone,
+			List<Group> groups) {
+		super();
+		this.userID = userID;
+		this.username = username;
+		this.firstname = firstname;
+		this.lastname = lastname;
+		this.email = email;
+		this.phone = phone;
+		this.groups = groups;
+	}
+
+	public int getUserID() {
+		return userID;
+	}
+
+	public void setUserID(int userID) {
+		this.userID = userID;
 	}
 
 	public String getUsername() {
@@ -34,33 +57,43 @@ public class User {
 		this.username = username;
 	}
 
-	public String getPassword() {
-		return password;
+	public String getFirstname() {
+		return firstname;
 	}
 
-	public void setPassword(String password) {
-		this.password = password;
+	public void setFirstname(String firstname) {
+		this.firstname = firstname;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (id ^ (id >>> 32));
-		return result;
+	public String getLastname() {
+		return lastname;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		User other = (User) obj;
-		if (id != other.id)
-			return false;
-		return true;
+	public void setLastname(String lastname) {
+		this.lastname = lastname;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public List<Group> getGroups() {
+		return groups;
+	}
+
+	public void setGroups(List<Group> groups) {
+		this.groups = groups;
 	}
 }

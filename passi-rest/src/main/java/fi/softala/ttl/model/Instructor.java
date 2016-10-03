@@ -1,3 +1,6 @@
+/**
+ * @author Mika Ropponen
+ */
 package fi.softala.ttl.model;
 
 import java.io.Serializable;
@@ -6,36 +9,36 @@ public class Instructor implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private String username;
+	private int    userID;
 	private String firstname;
 	private String lastname;
 	private String email;
-	private String school;
+	private String phone;
 	
 	public Instructor() {
 		super();
-		this.username = "";
+		this.userID = 0;
 		this.firstname = "";
 		this.lastname = "";
 		this.email = "";
-		this.school = "";
+		this.phone = "";
 	}
 
-	public Instructor(String username, String firstanme, String lastname, String email, String school) {
+	public Instructor(int userID, String firstanme, String lastname, String email, String phone) {
 		super();
-		this.username = username;
+		this.userID = userID;
 		this.firstname = firstanme;
 		this.lastname = lastname;
 		this.email = email;
-		this.school = school;
+		this.phone = phone;
 	}
 
-	public String getUsername() {
-		return username;
+	public int getUserID() {
+		return userID;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	public void setUserID(int userID) {
+		this.userID = userID;
 	}
 
 	public String getFirstname() {
@@ -62,11 +65,11 @@ public class Instructor implements Serializable {
 		this.email = email;
 	}
 
-	public String getSchool() {
-		return school;
+	public String getPhone() {
+		return phone;
 	}
 
-	public void setSchool(String school) {
-		this.school = school;
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 }

@@ -3,17 +3,17 @@
  */
 package fi.softala.ttl.dao;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import fi.softala.ttl.model.AnswerWorksheetDTO;
-import fi.softala.ttl.model.Member;
+import fi.softala.ttl.model.User;
 import fi.softala.ttl.model.Worksheet;
 
 public interface PassiDAO {
 	
-	public Member getStudent(String username);
+	public User findUser(String username);
 	
-	public ArrayList<Worksheet> getWorksheets(String groupID);
+	public List<Worksheet> getWorksheets(int groupID);
 	
 	public boolean isAnswerExist(int worksheetID);
 	
