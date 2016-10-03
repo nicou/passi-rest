@@ -5,7 +5,7 @@ package fi.softala.ttl.dao;
 
 import java.util.List;
 
-import fi.softala.ttl.model.AnswerWorksheetDTO;
+import fi.softala.ttl.model.WorksheetAnswer;
 import fi.softala.ttl.model.User;
 import fi.softala.ttl.model.Worksheet;
 
@@ -17,7 +17,7 @@ public interface PassiDAO {
 	
 	public boolean isAnswerExist(int worksheetID);
 	
-	public void saveAnswer(AnswerWorksheetDTO answer);
+	public void saveAnswer(WorksheetAnswer answer);
 	
 	public boolean deleteAnswer(int worksheetID, String username);
 }

@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import fi.softala.ttl.model.AnswerWorksheetDTO;
+import fi.softala.ttl.model.WorksheetAnswer;
 import fi.softala.ttl.model.User;
 import fi.softala.ttl.model.Worksheet;
 import fi.softala.ttl.service.PassiService;
@@ -56,11 +56,10 @@ public class PassiRestController {
 		if (worksheets.size() == 0) throw new WorksheetNotFoundException(groupID);
 		return new ResponseEntity<List<Worksheet>>(worksheets, HttpStatus.OK);
 	}
-	
-	// Save student answers
+
 	@RequestMapping(value = "/answer/", method = RequestMethod.POST)
 	public ResponseEntity<String> saveAnswer(
-			@RequestBody AnswerWorksheetDTO answer,
+			@RequestBody WorksheetAnswer answer,
 			UriComponentsBuilder ucBuilder) {
 		String message = new String("");
 		if (passiService.isAnswerExist(answer)) {
@@ -77,8 +76,7 @@ public class PassiRestController {
 		headers.setLocation(ucBuilder.path("/answer/{id}").buildAndExpand(answer.getAnswerID()).toUri());
 		return new ResponseEntity<String>(headers, HttpStatus.CREATED);
 	}
-	
-	// Delete student answers
+
 	@RequestMapping(value = "/answer/{worksheet}/{username}", method = RequestMethod.DELETE)
 	public ResponseEntity<String> deleteAnswer(
 			@PathVariable("worksheet") int worksheetID,

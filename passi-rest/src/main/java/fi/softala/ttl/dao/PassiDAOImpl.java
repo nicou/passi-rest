@@ -28,7 +28,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import fi.softala.ttl.model.Option;
 import fi.softala.ttl.model.AnswerWaypointDTO;
-import fi.softala.ttl.model.AnswerWorksheetDTO;
+import fi.softala.ttl.model.WorksheetAnswer;
 import fi.softala.ttl.model.Group;
 import fi.softala.ttl.model.Instructor;
 import fi.softala.ttl.model.User;
@@ -194,7 +194,7 @@ public class PassiDAOImpl implements PassiDAO {
 		return false;
 	}
 
-	public void saveAnswer(final AnswerWorksheetDTO answer) {
+	public void saveAnswer(final WorksheetAnswer answer) {
 
 		final String SQL1 = "INSERT INTO vastaus (vastaus_id, username, tk_id, v_suunnitelma) VALUES (?, ?, ?, ?)";
 

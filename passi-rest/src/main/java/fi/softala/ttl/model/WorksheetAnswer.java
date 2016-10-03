@@ -6,7 +6,7 @@ package fi.softala.ttl.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class AnswerWorksheetDTO implements Serializable {
+public class WorksheetAnswer implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -17,7 +17,7 @@ public class AnswerWorksheetDTO implements Serializable {
 	private ArrayList<AnswerWaypointDTO> waypoints;
 	private String instructorComment;
 	
-	public AnswerWorksheetDTO() {
+	public WorksheetAnswer() {
 		super();
 		this.answerID = 0; // new answer
 		this.worksheetID = 0;
@@ -27,7 +27,7 @@ public class AnswerWorksheetDTO implements Serializable {
 		this.instructorComment = "";
 	}
 	
-	public AnswerWorksheetDTO(int answerID, int worksheetID, String username, String planningText,
+	public WorksheetAnswer(int answerID, int worksheetID, String username, String planningText,
 			ArrayList<AnswerWaypointDTO> waypoints, String instructorComment) {
 		super();
 		this.answerID = answerID;
