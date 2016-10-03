@@ -70,6 +70,10 @@ public class PassiRestController {
 			message = "Student [" + answer.getUsername() + "] has already answered to the worksheet [" + answer.getWorksheetID() + "].";
 			return new ResponseEntity<String>(message, HttpStatus.CONFLICT);
 		}
+		if (answer.getPlanningText().equals("") || answer.getWaypoints().size() == 0) {
+			message = "Give proper values in answer sheet.";
+			return new ResponseEntity<String>(message, HttpStatus.BAD_REQUEST);
+		}
 		passiService.saveAnswer(answer);
 		HttpHeaders headers = new HttpHeaders();
 		headers.setLocation(ucBuilder.path("/answer/{id}").buildAndExpand(answer.getAnswerID()).toUri());
@@ -111,16 +115,16 @@ public class PassiRestController {
 				File serverFile = new File(dir.getAbsolutePath() + File.separator + file + ".jpg");
 				stream = new BufferedOutputStream(new FileOutputStream(serverFile));
 				stream.write(payload);
-				message = "You successfully uploaded file " + file + ".";
+				message = "You successfully uploaded image " + file + ".jpg.";
 				return new ResponseEntity<String>(message, HttpStatus.OK);
 			} catch (Exception e) {
-				message = "You failed to upload file " + file + ".";
+				message = "You failed to upload image " + file + ".jpg.";
 				return new ResponseEntity<String>(message, HttpStatus.BAD_REQUEST);
 			} finally {
 				IOUtils.closeQuietly(stream);
 			}
 		} else {
-			message = "You failed to upload " + file + " because the file was empty.";
+			message = "You failed to upload image " + file + ".jpg because the file was empty.";
 			return new ResponseEntity<String>(message, HttpStatus.BAD_REQUEST);
 		}
 	}
