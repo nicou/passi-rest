@@ -107,7 +107,7 @@ public class PassiDAOImpl implements PassiDAO {
 							return instructor;
 						}
 					});
-			group.setInstructors(instructors);
+			group.setGroupInstructors(instructors);
 		}
 		return user;
 	}
