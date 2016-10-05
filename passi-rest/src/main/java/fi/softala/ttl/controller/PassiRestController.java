@@ -79,10 +79,15 @@ public class PassiRestController {
 			message = "User [" + answersheet.getUserID() + "] has already answered to the worksheet [" + answersheet.getWorksheetID() + "].";
 			return new ResponseEntity<String>(message, HttpStatus.CONFLICT);
 		}
-		dao.saveAnswer(answersheet);
-		HttpHeaders headers = new HttpHeaders();
-		headers.setLocation(ucBuilder.path("/answer/{id}").buildAndExpand(answersheet.getAnswersheetID()).toUri());
-		return new ResponseEntity<String>(headers, HttpStatus.CREATED);
+		if (dao.saveAnswer(answersheet)) {
+			HttpHeaders headers = new HttpHeaders();
+			headers.setLocation(ucBuilder.path("/answer/{id}").buildAndExpand(answersheet.getAnswersheetID()).toUri());
+			return new ResponseEntity<String>(headers, HttpStatus.CREATED);
+		} else {
+			message = "Save answers interrupted for unknown reason. No changes to database.";
+			return new ResponseEntity<String>(message, HttpStatus.EXPECTATION_FAILED);
+		}
+		
 	}
 	
 	// Delete student answers

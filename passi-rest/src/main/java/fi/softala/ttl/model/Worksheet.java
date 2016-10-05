@@ -11,28 +11,27 @@ public class Worksheet implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private int    worksheetID;
-	private String header;
-	private String preface;
-	private String planning;
-	
-	private List<Waypoint> waypoints;
+	private String worksheetHeader;
+	private String worksheetPreface;
+	private String worksheetPlanning;
+	private List<Waypoint> worksheetWaypoints;
 	
 	public Worksheet() {
 		super();
-		worksheetID = 0;
-		header = "";
-		preface = "";
-		planning = "";
-		waypoints = null;
+		this.worksheetID = 0;
+		this.worksheetHeader = "";
+		this.worksheetPreface = "";
+		this.worksheetPlanning = "";
+		this.worksheetWaypoints = null;
 	}
 
-	public Worksheet(int worksheetID, String header, String preface, String planning, List<Waypoint> waypoints) {
+	public Worksheet(int worksheetID, String worksheetHeader, String worksheetPreface, String worksheetPlanning, List<Waypoint> worksheetWaypoints) {
 		super();
 		this.worksheetID = worksheetID;
-		this.header = header;
-		this.preface = preface;
-		this.planning = planning;
-		this.waypoints = waypoints;
+		this.worksheetHeader = worksheetHeader;
+		this.worksheetPreface = worksheetPreface;
+		this.worksheetPlanning = worksheetPlanning;
+		this.worksheetWaypoints = worksheetWaypoints;
 	}
 
 	public int getWorksheetID() {
@@ -42,36 +41,36 @@ public class Worksheet implements Serializable {
 	public void setWorksheetID(int worksheetID) {
 		this.worksheetID = worksheetID;
 	}
-	
-	public String getHeader() {
-		return header;
+
+	public String getWorksheetHeader() {
+		return worksheetHeader;
 	}
 
-	public void setHeader(String header) {
-		this.header = header;
+	public void setWorksheetHeader(String worksheetHeader) {
+		this.worksheetHeader = worksheetHeader;
 	}
 
-	public String getPreface() {
-		return preface;
+	public String getWorksheetPreface() {
+		return worksheetPreface;
 	}
 
-	public void setPreface(String preface) {
-		this.preface = preface;
+	public void setWorksheetPreface(String worksheetPreface) {
+		this.worksheetPreface = worksheetPreface;
 	}
 
-	public String getPlanning() {
-		return planning;
+	public String getWorksheetPlanning() {
+		return worksheetPlanning;
 	}
 
-	public void setPlanning(String planning) {
-		this.planning = planning;
+	public void setWorksheetPlanning(String worksheetPlanning) {
+		this.worksheetPlanning = worksheetPlanning;
 	}
 
-	public List<Waypoint> getWaypoints() {
-		return waypoints;
+	public List<Waypoint> getWorksheetWaypoints() {
+		return worksheetWaypoints;
 	}
 
-	public void setWaypoints(List<Waypoint> waypoints) {
-		this.waypoints = waypoints;
+	public void setWorksheetWaypoints(List<Waypoint> worksheetWaypoints) {
+		this.worksheetWaypoints = worksheetWaypoints;
 	}
 }

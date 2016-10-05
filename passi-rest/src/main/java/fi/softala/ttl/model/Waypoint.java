@@ -14,21 +14,21 @@ public class Waypoint implements Serializable {
 	private String  waypointTask;
 	private boolean waypointPhotoEnabled;
 	
-	private List<Option> options;
+	private List<Option> waypointOptions;
 	
 	public Waypoint() {
 		super();
 		this.waypointID = 0;
 		this.waypointTask = "";
 		this.waypointPhotoEnabled = false;
-		this.options = null;
+		this.waypointOptions = null;
 	}
 
-	public Waypoint(int waypointID, String waypointTask, List<Option> options) {
+	public Waypoint(int waypointID, String waypointTask, List<Option> waypointOptions) {
 		super();
 		this.waypointID = waypointID;
 		this.waypointTask = waypointTask;
-		this.options = options;
+		this.waypointOptions = waypointOptions;
 	}
 
 	public int getWaypointID() {
@@ -55,11 +55,11 @@ public class Waypoint implements Serializable {
 		this.waypointPhotoEnabled = waypointPhotoEnabled;
 	}
 	
-	public List<Option> getOptions() {
-		return options;
+	public List<Option> getWaypointOptions() {
+		return waypointOptions;
 	}
 
-	public void setOptions(List<Option> options) {
-		this.options = options;
+	public void setWaypointOptions(List<Option> waypointOptions) {
+		this.waypointOptions = waypointOptions;
 	}
 }
