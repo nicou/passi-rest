@@ -27,8 +27,8 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import fi.softala.ttl.model.Option;
-import fi.softala.ttl.model.AnswerWaypointDTO;
-import fi.softala.ttl.model.AnswerWorksheetDTO;
+import fi.softala.ttl.model.Answerpoint;
+import fi.softala.ttl.model.Answersheet;
 import fi.softala.ttl.model.Group;
 import fi.softala.ttl.model.Instructor;
 import fi.softala.ttl.model.User;
@@ -52,10 +52,9 @@ public class PassiDAOImpl implements PassiDAO {
 	@Autowired
 	private PlatformTransactionManager platformTransactionManager;
 
+	// Find and return user with all related data
 	public User findUser(String username) {
-		
 		final String SQL1 = "SELECT user_id, username, firstname, lastname, email, phone FROM users WHERE username = ?";
-		
 		User user = jdbcTemplate.query(SQL1, new Object[] { username }, new ResultSetExtractor<User>() {
 
 			@Override
@@ -73,16 +72,13 @@ public class PassiDAOImpl implements PassiDAO {
 				return null;
 			}
 		});
-		
 		if (user == null) {
 			return null;
 		}
-		
 		final String SQL2 = "SELECT groups.group_id, groups.group_name FROM groups "
 				+ "JOIN members ON members.group_id = groups.group_id "
 				+ "JOIN users ON members.user_id = users.user_id "
 				+ "WHERE users.user_id = ?";
-		
 		List<Group> groups = jdbcTemplate.query(SQL2, new Object[] { user.getUserID() }, new RowMapper<Group>() {
 
 			@Override
@@ -93,13 +89,10 @@ public class PassiDAOImpl implements PassiDAO {
 				return group;
 			}
 		});
-		
 		user.setGroups(groups);
-		
 		final String SQL3 = "SELECT users.user_id, users.firstname, users.lastname, users.email, users.phone FROM users "
 				+ "JOIN members ON members.user_id = users.user_id "
 				+ "WHERE users.role_id = 2 AND members.group_id = ?";
-		
 		for (Group group : user.getGroups()) {
 			List<Instructor> instructors = jdbcTemplate.query(SQL3, new Object[] { group.getGroupID() }, new RowMapper<Instructor>() {
 				
@@ -116,17 +109,13 @@ public class PassiDAOImpl implements PassiDAO {
 			});
 			group.setInstructors(instructors);
 		}
-		
 		return user;
 	}
-
 	public List<Worksheet> getWorksheets(int groupID) {
-
 		final String SQL1 = "SELECT worksheets.worksheet_id, worksheets.worksheet_header, "
 				+ "worksheets.worksheet_preface, worksheets.worksheet_planning FROM worksheets "
 				+ "JOIN distribution ON distribution.worksheet_id = worksheets.worksheet_id "
 				+ "WHERE distribution.group_id = ?";
-		
 		List<Worksheet> worksheets = jdbcTemplate.query(SQL1, new Object[] { groupID }, new RowMapper<Worksheet>() {
 
 			@Override
@@ -139,14 +128,11 @@ public class PassiDAOImpl implements PassiDAO {
 				return worksheet;
 			}
 		});
-
 		if (worksheets == null) {
 			return null;
 		}
-		
 		final String SQL2 = "SELECT waypoint_id, waypoint_task, waypoint_photo_enabled FROM waypoints "
 				+ "WHERE worksheet_id = ?";
-		
 		List<Waypoint> waypoints = null;
 		for (Worksheet worksheet : worksheets) {
 			waypoints = jdbcTemplate.query(SQL2, new Object[] { worksheet.getWorksheetID() }, new RowMapper<Waypoint>() {
@@ -162,9 +148,7 @@ public class PassiDAOImpl implements PassiDAO {
 			});
 			worksheet.setWaypoints(waypoints);
 		}
-
 		final String SQL3 = "SELECT option_id, option_text FROM options WHERE waypoint_id = ?";
-		
 		List<Option> options = null;
 		for (Worksheet worksheet : worksheets) {
 			for (Waypoint waypoint : worksheet.getWaypoints()) {
@@ -181,75 +165,72 @@ public class PassiDAOImpl implements PassiDAO {
 				waypoint.setOptions(options);
 			}
 		}
-
 		return worksheets;
 	}
-
-	public boolean isAnswerExist(int worksheetID) {
-		final String SQL = "SELECT EXISTS (SELECT 1 FROM answer WHERE worksheet_id = ?)";
-		int exists = jdbcTemplate.queryForObject(SQL, new Object[] { worksheetID }, Integer.class);
+	
+	// Check if user has already answered to the worksheet
+	public boolean isAnswerExist(int worksheetID, int userID) {
+		final String SQL = "SELECT EXISTS (SELECT 1 FROM answersheets WHERE worksheet_id = ? AND user_id = ?)";
+		int exists = jdbcTemplate.queryForObject(SQL, new Object[] { worksheetID, userID }, Integer.class);
 		if (exists == 1) {
 			return true;
 		}
 		return false;
 	}
-
-	public void saveAnswer(final AnswerWorksheetDTO answer) {
-
-		final String SQL1 = "INSERT INTO vastaus (vastaus_id, username, tk_id, v_suunnitelma) VALUES (?, ?, ?, ?)";
-
+	
+	// Save user answer
+	public void saveAnswer(Answersheet answersheet) {
+		final String SQL1 = "INSERT INTO answersheets (answersheet_id, planning, instructor_comment, timestamp, worksheet_id, group_id, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
 		KeyHolder keyHolder = new GeneratedKeyHolder();
-
+		
 		// Execute query
 		jdbcTemplate.update(new PreparedStatementCreator() {
 
 			public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
-				PreparedStatement ps = connection.prepareStatement(SQL1, new String[] { "vastaus_id" });
+				PreparedStatement ps = connection.prepareStatement(SQL1, new String[] { "answersheet_id" });
 				ps.setInt(1, Types.NULL);
-				ps.setString(2, answer.getUsername());
-				ps.setInt(3, answer.getWorksheetID());
-				ps.setString(4, answer.getPlanningText());
-				// Timestamp.valueOf(datetimeDB) => vastaus_aika
+				ps.setString(2, answersheet.getPlanning());
+				ps.setString(3, answersheet.getInstructorComment());
+				ps.setTimestamp(4, answersheet.getTimestamp());
+				ps.setInt(5, answersheet.getWorksheetID());
+				ps.setInt(6, answersheet.getGroupID());
+				ps.setInt(7, answersheet.getUserID());
 				return ps;
 			}
 		}, keyHolder);
-
 		final int ID = keyHolder.getKey().intValue();
-		answer.setAnswerID(ID);
-
-		final String SQL2 = "INSERT INTO etappi_valinta (vastaus_id, etappi_id, valinta_id, tekstikentta, kuva_url) "
-				+ "VALUES (?, ?, ?, ?, ?)";
-
+		answersheet.setAnswersheetID(ID);
+		final String SQL2 = "INSERT INTO answerpoints (answerpoint_id, answer_text, instructor_comment, image_url, answersheet_id, waypoint_id, option_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
 		jdbcTemplate.batchUpdate(SQL2, new BatchPreparedStatementSetter() {
 
 			@Override
 			public void setValues(PreparedStatement ps, int i) throws SQLException {
-				AnswerWaypointDTO waypoint = answer.getWaypoints().get(i);
-				ps.setInt(1, ID);
-				ps.setInt(2, waypoint.getWaypointID());
-				ps.setInt(3, waypoint.getSelectedOptionID());
-				ps.setString(4, waypoint.getAnswerText());
-				ps.setString(5, waypoint.getImageURL());
+				Answerpoint answerpoint = answersheet.getAnswerpoints().get(i);
+				ps.setInt(1, Types.NULL);
+				ps.setString(2, answerpoint.getAnswerText());
+				ps.setString(3, answerpoint.getInstructorComment());
+				ps.setString(4, answerpoint.getImageURL());
+				ps.setInt(5, ID);
+				ps.setInt(6, answerpoint.getWaypointID());
+				ps.setInt(7, answerpoint.getOptionID());
 			}
-
 			@Override
 			public int getBatchSize() {
-				return answer.getWaypoints().size();
+				return answersheet.getAnswerpoints().size();
 			}
 		});
 	}
 
-	public boolean deleteAnswer(int worksheetID, String username) {
+	public boolean deleteAnswer(int worksheetID, int userID) {
 		DefaultTransactionDefinition paramTransactionDefinition = new DefaultTransactionDefinition();
 		TransactionStatus status = platformTransactionManager.getTransaction(paramTransactionDefinition);
 		try {
 			// Delete related waypoints
-			final String SQL1 = "DELETE FROM etappi_valinta WHERE vastaus_id = "
-					+ "(SELECT vastaus_id FROM vastaus WHERE tk_id = ? AND username = ?)";
-			jdbcTemplate.update(SQL1, new Object[] { worksheetID, username });
+			final String SQL1 = "DELETE FROM answerpoints WHERE answersheet_id = (SELECT answersheet_id FROM answersheets WHERE worksheet_id = ? AND user_id = ?)";
+			jdbcTemplate.update(SQL1, new Object[] { worksheetID, userID });
 			// Delete related answer
-			final String SQL2 = "DELETE FROM vastaus WHERE tk_id = ? AND username = ?";
-			jdbcTemplate.update(SQL2, new Object[] { worksheetID, username });
+			final String SQL2 = "DELETE FROM answersheets WHERE worksheet_id = ? AND user_id = ?";
+			jdbcTemplate.update(SQL2, new Object[] { worksheetID, userID });
 			// Commit transactions
 			platformTransactionManager.commit(status);
 		} catch (Exception e) {

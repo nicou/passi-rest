@@ -8,8 +8,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -24,67 +25,77 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import fi.softala.ttl.model.AnswerWorksheetDTO;
+import fi.softala.ttl.model.Answersheet;
 import fi.softala.ttl.model.User;
 import fi.softala.ttl.model.Worksheet;
-import fi.softala.ttl.service.PassiService;
+import fi.softala.ttl.dao.PassiDAO;
 import fi.softala.ttl.exception.UserNotFoundException;
 import fi.softala.ttl.exception.WorksheetNotFoundException;
 
 @RestController
 public class PassiRestController {
-
-	@Autowired
-	PassiService passiService;
 	
+	@Inject
+	private PassiDAO dao;
+
+	public PassiDAO getDao() {
+		return dao;
+	}
+
+	public void setDao(PassiDAO dao) {
+		this.dao = dao;
+	}
+	
+	// Service start up
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String index() {
 		return "REST Web Service for Passi Application is running nice and smoothly!";
 	}
 
+	// Find and get user with all related data
 	@RequestMapping(value = "/user/{username}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<User> getStudent(@PathVariable("username") String username) {
-		User user = passiService.findUser(username);
+	public ResponseEntity<User> getUser(@PathVariable("username") String username) {
+		User user = dao.findUser(username);
 		if (user == null) throw new UserNotFoundException(username);
 		return new ResponseEntity<User>(user, HttpStatus.OK);
 	}
 	
+	// Get worksheets by group ID
 	@RequestMapping(value = "/worksheet/{group}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<Worksheet>> getWorksheet(
+	public ResponseEntity<List<Worksheet>> getWorksheets(
 			@PathVariable("group") int groupID) {
-		List<Worksheet> worksheets = passiService.getWorksheets(groupID);
+		List<Worksheet> worksheets = dao.getWorksheets(groupID);
 		if (worksheets.size() == 0) throw new WorksheetNotFoundException(groupID);
 		return new ResponseEntity<List<Worksheet>>(worksheets, HttpStatus.OK);
 	}
 	
 	// Save student answers
-	@RequestMapping(value = "/answer/", method = RequestMethod.POST)
+	@RequestMapping(value = "/answer/", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> saveAnswer(
-			@RequestBody AnswerWorksheetDTO answer,
+			@RequestBody Answersheet answersheet,
 			UriComponentsBuilder ucBuilder) {
 		String message = new String("");
-		if (passiService.isAnswerExist(answer)) {
-			message = "User [" + answer.getUsername() + "] has already answered to the worksheet ID: " + answer.getWorksheetID();
-			message = "Student [" + answer.getUsername() + "] has already answered to the worksheet [" + answer.getWorksheetID() + "].";
+		if (dao.isAnswerExist(answersheet.getWorksheetID(), answersheet.getUserID())) {
+			message = "User [" + answersheet.getUserID() + "] has already answered to the worksheet [" + answersheet.getWorksheetID() + "].";
 			return new ResponseEntity<String>(message, HttpStatus.CONFLICT);
 		}
-		passiService.saveAnswer(answer);
+		dao.saveAnswer(answersheet);
 		HttpHeaders headers = new HttpHeaders();
-		headers.setLocation(ucBuilder.path("/answer/{id}").buildAndExpand(answer.getAnswerID()).toUri());
+		headers.setLocation(ucBuilder.path("/answer/{id}").buildAndExpand(answersheet.getAnswersheetID()).toUri());
 		return new ResponseEntity<String>(headers, HttpStatus.CREATED);
 	}
 	
 	// Delete student answers
-	@RequestMapping(value = "/answer/{worksheet}/{username}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/answer/{worksheet}/{user}", method = RequestMethod.DELETE)
 	public ResponseEntity<String> deleteAnswer(
 			@PathVariable("worksheet") int worksheetID,
-			@PathVariable("username") String username) {
+			@PathVariable("user") int userID) {
 		String message = new String("");
-		if (!passiService.isAnswerExist(worksheetID)) {
+		if (!dao.isAnswerExist(worksheetID, userID)) {
 			message = "Deleting failed. Required answers not found.";
 			return new ResponseEntity<String>(message, HttpStatus.NOT_FOUND);
 		}
-		if (passiService.deleteAnswer(worksheetID, username)) {
+		if (dao.deleteAnswer(worksheetID, userID)) {
 			message = "Answers successfully deleted.";
 			return new ResponseEntity<String>(message, HttpStatus.NO_CONTENT);
 		} else {
