@@ -3,11 +3,13 @@
  */
 package fi.softala.ttl.controller;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.inject.Inject;
 
 import org.apache.commons.io.IOUtils;
@@ -110,7 +112,7 @@ public class PassiRestController {
 	}
 	
 	// Single image file upload as raw binary
-	@RequestMapping(value = "/upload/{file}", method = RequestMethod.POST, consumes = MediaType.IMAGE_JPEG_VALUE) // "image/jpeg"
+	@RequestMapping(value = "/upload/{file}", method = RequestMethod.POST, consumes = MediaType.IMAGE_JPEG_VALUE)
 	public ResponseEntity<String> uploadFileHandler(
 			@PathVariable("file") String file,
 			HttpEntity<byte[]> requestEntity) {
@@ -123,8 +125,12 @@ public class PassiRestController {
 				File dir = new File(rootPath + File.separator + "images");
 				if (!dir.exists()) { dir.mkdirs(); }
 				File serverFile = new File(dir.getAbsolutePath() + File.separator + file + ".jpg");
+				BufferedImage image = ImageIO.read(new ByteArrayInputStream(payload));
+				ImageIO.write(image, "JPG", serverFile);
+				/*
 				stream = new BufferedOutputStream(new FileOutputStream(serverFile));
 				stream.write(payload);
+				*/				
 				message = "You successfully uploaded file " + file + ".";
 				return new ResponseEntity<String>(message, HttpStatus.OK);
 			} catch (Exception e) {
