@@ -13,6 +13,7 @@ import javax.imageio.ImageIO;
 import javax.inject.Inject;
 
 import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -30,12 +31,16 @@ import org.springframework.web.util.UriComponentsBuilder;
 import fi.softala.ttl.model.Answersheet;
 import fi.softala.ttl.model.User;
 import fi.softala.ttl.model.Worksheet;
+import fi.softala.ttl.service.PassiService;
 import fi.softala.ttl.dao.PassiDAO;
 import fi.softala.ttl.exception.UserNotFoundException;
 import fi.softala.ttl.exception.WorksheetNotFoundException;
 
 @RestController
 public class PassiRestController {
+	
+	@Autowired
+    PassiService passiService;
 	
 	@Inject
 	private PassiDAO dao;
