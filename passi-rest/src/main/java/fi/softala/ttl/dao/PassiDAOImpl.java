@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -202,6 +203,7 @@ public class PassiDAOImpl implements PassiDAO {
 					return ps;
 				}
 			}, keyHolder);
+			
 			final int ID = keyHolder.getKey().intValue();
 			answersheet.setAnswersheetID(ID);
 
@@ -249,5 +251,55 @@ public class PassiDAOImpl implements PassiDAO {
 			return false;
 		}
 		return true;
+	}
+	
+	public Answersheet getAnswer(int worksheetID, int groupID, int userID) {
+		
+		final String SQL1 = "SELECT * FROM answersheets WHERE worksheet_id = ? AND group_id = ? AND user_id = ?";
+		final String SQL2 = "SELECT answerpoints.*, options.option_text FROM answerpoints "
+				+ "JOIN options ON answerpoints.option_id = options.option_id "
+				+ "WHERE answersheet_id = ?";
+		
+		Answersheet answersheet = jdbcTemplate.queryForObject(SQL1, new Object[] { worksheetID, groupID, userID }, new RowMapper<Answersheet>() {
+
+			@Override
+			public Answersheet mapRow(ResultSet rs, int rowNum) throws SQLException {
+				Answersheet answersheet = new Answersheet();
+				answersheet.setAnswersheetID(rs.getInt("answersheet_id"));
+				answersheet.setPlanning(rs.getString("planning"));
+				answersheet.setInstructorComment(rs.getString("instructor_comment"));
+				answersheet.setTimestamp(rs.getTimestamp("timestamp"));
+				answersheet.setWorksheetID(rs.getInt("worksheet_id"));
+				answersheet.setGroupID(rs.getInt("group_id"));
+				answersheet.setUserID(rs.getInt("user_id"));
+				return answersheet;
+			}
+		});
+		
+		if (answersheet == null) {
+			return null;
+		}
+		
+		List<Answerpoint> answerpoints = jdbcTemplate.query(SQL2, new Object[] { answersheet.getAnswersheetID() }, new RowMapper<Answerpoint>(){
+			
+			@Override
+			public Answerpoint mapRow(ResultSet rs, int rowNum) throws SQLException {
+				Answerpoint answerpoint = new Answerpoint();
+				answerpoint.setAnswerpointID(rs.getInt("answerpoint_id"));
+				answerpoint.setAnswerText(rs.getString("answer_text"));
+				answerpoint.setInstructorComment(rs.getString("instructor_comment"));
+				answerpoint.setInstructorRating(rs.getInt("instructor_rating"));
+				answerpoint.setImageURL(rs.getString("image_url"));
+				answerpoint.setAnswersheetID(rs.getInt("answersheet_id"));
+				answerpoint.setWaypointID(rs.getInt("waypoint_id"));
+				answerpoint.setOptionID(rs.getInt("option_id"));
+				answerpoint.setOptionText(rs.getString("option_text"));
+				return answerpoint;
+			}
+		});
+		
+		answersheet.setAnswerpoints((ArrayList<Answerpoint>) answerpoints); 
+		
+		return answersheet;
 	}
 }

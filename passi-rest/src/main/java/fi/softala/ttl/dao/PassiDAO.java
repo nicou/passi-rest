@@ -20,4 +20,7 @@ public interface PassiDAO {
 	public boolean saveAnswer(Answersheet answersheet);
 	
 	public boolean deleteAnswer(int worksheetID, int userID);
+	
+	public Answersheet getAnswer(int worksheetID, int groupID, int userID);
+	
 }

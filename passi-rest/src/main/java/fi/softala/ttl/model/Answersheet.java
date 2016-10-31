@@ -18,7 +18,6 @@ public class Answersheet implements Serializable {
 	private int worksheetID;
 	private int groupID;
 	private int userID;
-	
 	private ArrayList<Answerpoint> answerpoints;
 
 	public Answersheet() {

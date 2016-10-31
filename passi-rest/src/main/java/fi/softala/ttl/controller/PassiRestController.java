@@ -33,14 +33,12 @@ import fi.softala.ttl.model.User;
 import fi.softala.ttl.model.Worksheet;
 import fi.softala.ttl.service.PassiService;
 import fi.softala.ttl.dao.PassiDAO;
+import fi.softala.ttl.exception.EmptyAnswerContentException;
 import fi.softala.ttl.exception.UserNotFoundException;
 import fi.softala.ttl.exception.WorksheetNotFoundException;
 
 @RestController
 public class PassiRestController {
-	
-	@Autowired
-    PassiService passiService;
 	
 	@Inject
 	private PassiDAO dao;
@@ -52,6 +50,9 @@ public class PassiRestController {
 	public void setDao(PassiDAO dao) {
 		this.dao = dao;
 	}
+	
+	@Autowired
+	PassiService passiService;
 	
 	// Service start up
 	@RequestMapping(value = "/", method = RequestMethod.GET)
@@ -95,6 +96,17 @@ public class PassiRestController {
 			return new ResponseEntity<String>(message, HttpStatus.EXPECTATION_FAILED);
 		}
 		
+	}
+	
+	// Get student answers
+	@RequestMapping(value = "/answer/{worksheet}/{group}/{user}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Answersheet> getAnswers(
+			@PathVariable("worksheet") int worksheetID,
+			@PathVariable("group") int groupID,
+			@PathVariable("user") int userID) {
+		Answersheet answersheet = passiService.getAnswers(worksheetID, groupID, userID);
+		if (answersheet == null) throw new EmptyAnswerContentException(worksheetID, groupID, userID);
+		return new ResponseEntity<Answersheet>(answersheet, HttpStatus.OK);
 	}
 	
 	// Delete student answers
@@ -163,6 +175,15 @@ public class PassiRestController {
 	public Error worksheetNotFound(WorksheetNotFoundException e) {
 		int group = e.getGroupID();
 		return new Error("Worksheets for the group [" + group + "] not found.");
+	}
+	
+	@ExceptionHandler(EmptyAnswerContentException.class)
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public Error emptyAnswerContent(EmptyAnswerContentException e) {
+		int worksheet = e.getWorksheetID();
+		int group = e.getGroupID();
+		int user = e.getUserID();
+		return new Error("Answers for worksheet [" + worksheet + "], group [" + group + "] and user [" + user + "] not found.");
 	}
 	
 	/* Image file upload - multipart version
