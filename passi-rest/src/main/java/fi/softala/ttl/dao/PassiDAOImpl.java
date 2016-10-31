@@ -260,23 +260,25 @@ public class PassiDAOImpl implements PassiDAO {
 				+ "JOIN options ON answerpoints.option_id = options.option_id "
 				+ "WHERE answersheet_id = ?";
 		
-		Answersheet answersheet = jdbcTemplate.queryForObject(SQL1, new Object[] { worksheetID, groupID, userID }, new RowMapper<Answersheet>() {
-
-			@Override
-			public Answersheet mapRow(ResultSet rs, int rowNum) throws SQLException {
-				Answersheet answersheet = new Answersheet();
-				answersheet.setAnswersheetID(rs.getInt("answersheet_id"));
-				answersheet.setPlanning(rs.getString("planning"));
-				answersheet.setInstructorComment(rs.getString("instructor_comment"));
-				answersheet.setTimestamp(rs.getTimestamp("timestamp"));
-				answersheet.setWorksheetID(rs.getInt("worksheet_id"));
-				answersheet.setGroupID(rs.getInt("group_id"));
-				answersheet.setUserID(rs.getInt("user_id"));
-				return answersheet;
-			}
-		});
+		Answersheet answersheet = null;
 		
-		if (answersheet == null) {
+		try {
+			answersheet = jdbcTemplate.queryForObject(SQL1, new Object[] { worksheetID, groupID, userID }, new RowMapper<Answersheet>() {
+
+				@Override
+				public Answersheet mapRow(ResultSet rs, int rowNum) throws SQLException {
+					Answersheet answersheet = new Answersheet();
+					answersheet.setAnswersheetID(rs.getInt("answersheet_id"));
+					answersheet.setPlanning(rs.getString("planning"));
+					answersheet.setInstructorComment(rs.getString("instructor_comment"));
+					answersheet.setTimestamp(rs.getTimestamp("timestamp"));
+					answersheet.setWorksheetID(rs.getInt("worksheet_id"));
+					answersheet.setGroupID(rs.getInt("group_id"));
+					answersheet.setUserID(rs.getInt("user_id"));
+					return answersheet;
+				}
+			});
+		} catch (Exception e) {
 			return null;
 		}
 		
