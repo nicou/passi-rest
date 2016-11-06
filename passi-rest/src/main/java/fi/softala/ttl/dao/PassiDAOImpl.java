@@ -256,7 +256,7 @@ public class PassiDAOImpl implements PassiDAO {
 	public Answersheet getAnswer(int worksheetID, int groupID, int userID) {
 		
 		final String SQL1 = "SELECT * FROM answersheets WHERE worksheet_id = ? AND group_id = ? AND user_id = ?";
-		final String SQL2 = "SELECT answerpoints.*, options.option_text FROM answerpoints "
+		final String SQL2 = "SELECT * FROM answerpoints "
 				+ "JOIN options ON answerpoints.option_id = options.option_id "
 				+ "WHERE answersheet_id = ?";
 		
