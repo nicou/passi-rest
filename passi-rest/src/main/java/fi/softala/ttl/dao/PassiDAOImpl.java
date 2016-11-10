@@ -30,6 +30,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import fi.softala.ttl.model.Option;
 import fi.softala.ttl.model.Answerpoint;
 import fi.softala.ttl.model.Answersheet;
+import fi.softala.ttl.model.Category;
 import fi.softala.ttl.model.Group;
 import fi.softala.ttl.model.Instructor;
 import fi.softala.ttl.model.User;
@@ -114,60 +115,82 @@ public class PassiDAOImpl implements PassiDAO {
 	}
 
 	// Get worksheets by group ID
-	public List<Worksheet> getWorksheets(int groupID) {
-		final String SQL1 = "SELECT worksheets.worksheet_id, worksheets.header, "
-				+ "worksheets.preface, worksheets.planning FROM worksheets "
-				+ "JOIN distros ON distros.worksheet_id = worksheets.worksheet_id " + "WHERE distros.group_id = ?";
-		List<Worksheet> worksheets = jdbcTemplate.query(SQL1, new Object[] { groupID }, new RowMapper<Worksheet>() {
-
+	public List<Category> getWorksheets(int groupID) {
+		
+		final String SQL1 = "SELECT categories.category_id, categories.category_name FROM categories";
+		
+		List<Category> categories = jdbcTemplate.query(SQL1, new RowMapper<Category>() {
+			
 			@Override
-			public Worksheet mapRow(ResultSet rs, int rowNum) throws SQLException {
-				Worksheet worksheet = new Worksheet();
-				worksheet.setWorksheetID(rs.getInt("worksheet_id"));
-				worksheet.setWorksheetHeader(rs.getString("header"));
-				worksheet.setWorksheetPreface(rs.getString("preface"));
-				worksheet.setWorksheetPlanning(rs.getString("planning"));
-				return worksheet;
+			public Category mapRow(ResultSet rs, int rowNum) throws SQLException {
+				Category category = new Category();
+				category.setCategoryID(rs.getInt("category_id"));
+				category.setCategoryName(rs.getString("category_name"));
+				return category;
 			}
 		});
-		if (worksheets == null) {
-			return null;
-		}
-		final String SQL2 = "SELECT waypoint_id, task, photo_enabled FROM waypoints WHERE worksheet_id = ?";
-		List<Waypoint> waypoints = null;
-		for (Worksheet worksheet : worksheets) {
-			waypoints = jdbcTemplate.query(SQL2, new Object[] { worksheet.getWorksheetID() },
-					new RowMapper<Waypoint>() {
+		
+		final String SQL2 = "SELECT worksheets.worksheet_id, worksheets.header, "
+				+ "worksheets.preface, worksheets.planning FROM worksheets "
+				+ "JOIN distros ON distros.worksheet_id = worksheets.worksheet_id "
+				+ "JOIN categories ON worksheets.category_id = categories.category_id "
+				+ "WHERE distros.group_id = ? AND categories.category_id = ?";
+		
+		for (Category category : categories) {
+			
+			List<Worksheet> worksheets = new ArrayList<>();
+			worksheets = jdbcTemplate.query(SQL2, new Object[] { groupID, category.getCategoryID() }, new RowMapper<Worksheet>() {
 
-						@Override
-						public Waypoint mapRow(ResultSet rs, int rowNum) throws SQLException {
-							Waypoint waypoint = new Waypoint();
-							waypoint.setWaypointID(rs.getInt("waypoint_id"));
-							waypoint.setWaypointTask(rs.getString("task"));
-							waypoint.setWaypointPhotoEnabled(rs.getBoolean("photo_enabled"));
-							return waypoint;
-						}
-					});
-			worksheet.setWorksheetWaypoints(waypoints);
-		}
-		final String SQL3 = "SELECT option_id, option_text FROM options WHERE waypoint_id = ?";
-		List<Option> options = null;
-		for (Worksheet worksheet : worksheets) {
-			for (Waypoint waypoint : worksheet.getWorksheetWaypoints()) {
-				options = jdbcTemplate.query(SQL3, new Object[] { waypoint.getWaypointID() }, new RowMapper<Option>() {
+				@Override
+				public Worksheet mapRow(ResultSet rs, int rowNum) throws SQLException {
+					Worksheet worksheet = new Worksheet();
+					worksheet.setWorksheetID(rs.getInt("worksheet_id"));
+					worksheet.setWorksheetHeader(rs.getString("header"));
+					worksheet.setWorksheetPreface(rs.getString("preface"));
+					worksheet.setWorksheetPlanning(rs.getString("planning"));
+					return worksheet;
+				}
+			});
+			
+			final String SQL3 = "SELECT waypoint_id, task, photo_enabled FROM waypoints WHERE worksheet_id = ?";
+			
+			List<Waypoint> waypoints = new ArrayList<>();
+			for (Worksheet worksheet : worksheets) {
+				waypoints = jdbcTemplate.query(SQL3, new Object[] { worksheet.getWorksheetID() }, new RowMapper<Waypoint>() {
 
 					@Override
-					public Option mapRow(ResultSet rs, int rowNum) throws SQLException {
-						Option option = new Option();
-						option.setOptionID(rs.getInt("option_id"));
-						option.setOptionText(rs.getString("option_text"));
-						return option;
+					public Waypoint mapRow(ResultSet rs, int rowNum) throws SQLException {
+						Waypoint waypoint = new Waypoint();
+						waypoint.setWaypointID(rs.getInt("waypoint_id"));
+						waypoint.setWaypointTask(rs.getString("task"));
+						waypoint.setWaypointPhotoEnabled(rs.getBoolean("photo_enabled"));
+						return waypoint;
 					}
 				});
-				waypoint.setWaypointOptions(options);
+				worksheet.setWorksheetWaypoints(waypoints);
 			}
+			
+			final String SQL4 = "SELECT option_id, option_text FROM options WHERE waypoint_id = ?";
+			
+			List<Option> options = null;
+			for (Worksheet worksheet : worksheets) {
+				for (Waypoint waypoint : worksheet.getWorksheetWaypoints()) {
+					options = jdbcTemplate.query(SQL4, new Object[] { waypoint.getWaypointID() }, new RowMapper<Option>() {
+
+						@Override
+						public Option mapRow(ResultSet rs, int rowNum) throws SQLException {
+							Option option = new Option();
+							option.setOptionID(rs.getInt("option_id"));
+							option.setOptionText(rs.getString("option_text"));
+							return option;
+						}
+					});
+					waypoint.setWaypointOptions(options);
+				}
+			}
+			category.setCategoryWorksheets((ArrayList<Worksheet>) worksheets);
 		}
-		return worksheets;
+		return categories;
 	}
 
 	// Check if user has already answered to the worksheet

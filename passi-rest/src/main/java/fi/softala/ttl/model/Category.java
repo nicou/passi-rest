@@ -1,9 +1,7 @@
-/**
- * @author Mika Ropponen
- */
 package fi.softala.ttl.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class Category implements Serializable {
 
@@ -11,22 +9,26 @@ public class Category implements Serializable {
 
 	private int categoryID;
 	private String categoryName;
+	private ArrayList<Worksheet> categoryWorksheets;
 	
 	public Category() {
 		super();
 		categoryID = 0;
 		categoryName = "";
+		categoryWorksheets = new ArrayList<>();
 	}
 
-	public Category(int categoryID, String categoryName) {
+	public Category(int categoryID, String categoryName, ArrayList<Worksheet> categoryWorksheets) {
 		super();
 		this.categoryID = categoryID;
 		this.categoryName = categoryName;
+		this.categoryWorksheets = categoryWorksheets;
 	}
 	
 	public void reset() {
 		categoryID = 0;
 		categoryName = "";
+		categoryWorksheets.clear();
 	}
 
 	public int getCategoryID() {
@@ -45,9 +47,18 @@ public class Category implements Serializable {
 		this.categoryName = categoryName;
 	}
 
+	public ArrayList<Worksheet> getCategoryWorksheets() {
+		return categoryWorksheets;
+	}
+
+	public void setCategoryWorksheets(ArrayList<Worksheet> categoryWorksheets) {
+		this.categoryWorksheets = categoryWorksheets;
+	}
+	
 	@Override
 	public String toString() {
-		return "CategoryDTO [categoryID=" + categoryID + ", categoryName=" + categoryName + "]";
+		return "Category [categoryID=" + categoryID + ", categoryName=" + categoryName + ", categoryWorksheets="
+				+ categoryWorksheets + "]";
 	}
 
 }

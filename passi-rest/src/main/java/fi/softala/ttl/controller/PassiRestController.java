@@ -29,8 +29,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import fi.softala.ttl.model.Answersheet;
+import fi.softala.ttl.model.Category;
 import fi.softala.ttl.model.User;
-import fi.softala.ttl.model.Worksheet;
 import fi.softala.ttl.service.PassiService;
 import fi.softala.ttl.dao.PassiDAO;
 import fi.softala.ttl.exception.EmptyAnswerContentException;
@@ -70,11 +70,11 @@ public class PassiRestController {
 	
 	// Get worksheets by group ID
 	@RequestMapping(value = "/worksheet/{group}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<Worksheet>> getWorksheets(
+	public ResponseEntity<List<Category>> getWorksheets(
 			@PathVariable("group") int groupID) {
-		List<Worksheet> worksheets = dao.getWorksheets(groupID);
-		if (worksheets.size() == 0) throw new WorksheetNotFoundException(groupID);
-		return new ResponseEntity<List<Worksheet>>(worksheets, HttpStatus.OK);
+		List<Category> categorizedWorksheets = dao.getWorksheets(groupID);
+		if (categorizedWorksheets.size() == 0) throw new WorksheetNotFoundException(groupID);
+		return new ResponseEntity<List<Category>>(categorizedWorksheets, HttpStatus.OK);
 	}
 	
 	// Save student answers

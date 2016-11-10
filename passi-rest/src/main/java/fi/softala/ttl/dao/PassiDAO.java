@@ -6,14 +6,14 @@ package fi.softala.ttl.dao;
 import java.util.List;
 
 import fi.softala.ttl.model.Answersheet;
+import fi.softala.ttl.model.Category;
 import fi.softala.ttl.model.User;
-import fi.softala.ttl.model.Worksheet;
 
 public interface PassiDAO {
 	
 	public User findUser(String username);
 	
-	public List<Worksheet> getWorksheets(int groupID);
+	public List<Category> getWorksheets(int groupID);
 	
 	public boolean isAnswerExist(int worksheetID, int userID);
 	
@@ -21,6 +21,5 @@ public interface PassiDAO {
 	
 	public boolean deleteAnswer(int worksheetID, int userID);
 	
-	public Answersheet getAnswer(int worksheetID, int groupID, int userID);
-	
+	public Answersheet getAnswer(int worksheetID, int groupID, int userID);	
 }
