@@ -57,7 +57,7 @@ public class PassiRestController {
 	// Service start up
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String index() {
-		return "REST Web Service for Passi Application is running nice and smoothly!";
+		return "<html><head><title>PASSI REST SERVICE</title></head><body>REST Web Service for Passi Application is running nice and smoothly!</body></html>";
 	}
 
 	// Find and get user with all related data

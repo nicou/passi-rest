@@ -6,6 +6,7 @@ package fi.softala.ttl.dao;
 import java.util.List;
 
 import fi.softala.ttl.model.Answersheet;
+import fi.softala.ttl.model.AuthUser;
 import fi.softala.ttl.model.Category;
 import fi.softala.ttl.model.User;
 
@@ -21,5 +22,7 @@ public interface PassiDAO {
 	
 	public boolean deleteAnswer(int worksheetID, int userID);
 	
-	public Answersheet getAnswer(int worksheetID, int groupID, int userID);	
+	public Answersheet getAnswer(int worksheetID, int groupID, int userID);
+	
+	public List<AuthUser> getAuthUsers();
 }

@@ -1,5 +1,7 @@
 package fi.softala.ttl.security;
 
+import javax.inject.Inject;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,17 +12,34 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import fi.softala.ttl.dao.PassiDAO;
+import fi.softala.ttl.model.AuthUser;
  
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
  
     private static String REALM = "PASSI_REALM";
+    
+    @Inject
+	private PassiDAO dao;
+
+	public PassiDAO getDao() {
+		return dao;
+	}
+
+	public void setDao(PassiDAO dao) {
+		this.dao = dao;
+	}
      
     @Autowired
     public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication().withUser("tuuti").password("tuuti").roles("ADMIN");
-        auth.inMemoryAuthentication().withUser("jaapa").password("jaapa").roles("USER");
+    	for (AuthUser authUser : dao.getAuthUsers()) {
+    		auth.inMemoryAuthentication().passwordEncoder(passwordEncoder()).withUser(authUser.getUsername()).password(authUser.getPassword()).roles("USER");
+    	}
     }
      
     @Override
@@ -32,6 +51,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .antMatchers("/student/**", "/worksheet/**").hasRole("USER")
         .and().httpBasic().realmName(REALM).authenticationEntryPoint(getBasicAuthEntryPoint())
         .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    }
+    
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
      
     @Bean

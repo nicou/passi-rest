@@ -30,6 +30,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import fi.softala.ttl.model.Option;
 import fi.softala.ttl.model.Answerpoint;
 import fi.softala.ttl.model.Answersheet;
+import fi.softala.ttl.model.AuthUser;
 import fi.softala.ttl.model.Category;
 import fi.softala.ttl.model.Group;
 import fi.softala.ttl.model.Instructor;
@@ -326,5 +327,22 @@ public class PassiDAOImpl implements PassiDAO {
 		answersheet.setAnswerpoints((ArrayList<Answerpoint>) answerpoints); 
 		
 		return answersheet;
+	}
+
+	// Get all instructor users for basic authentication
+	@Override
+	public List<AuthUser> getAuthUsers() {
+		final String SQL = "SELECT username, password FROM users WHERE role_id = 1";
+		List<AuthUser> authUsers = jdbcTemplate.query(SQL, new RowMapper<AuthUser>(){
+			
+			@Override
+			public AuthUser mapRow(ResultSet rs, int rowNum) throws SQLException {
+				AuthUser authUser = new AuthUser();
+				authUser.setUsername(rs.getString("username"));
+				authUser.setPassword(rs.getString("password"));
+				return authUser;
+			}
+		});
+		return authUsers;
 	}
 }
