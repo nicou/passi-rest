@@ -14,11 +14,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @Configuration
 @EnableWebMvc
+@EnableScheduling
 @ComponentScan(basePackages = "fi.softala.ttl.*")
 @PropertySource("classpath:data.properties")
 public class ApplicationConfiguration extends WebMvcConfigurerAdapter {
@@ -66,13 +68,4 @@ public class ApplicationConfiguration extends WebMvcConfigurerAdapter {
 	    list.add(MediaType.APPLICATION_OCTET_STREAM);
 	    return list;
 	}
-	/*
-	@Bean(name = "filterMultipartResolver")
-	public CommonsMultipartResolver filterMultipartResolver() {
-		CommonsMultipartResolver filterMultipartResolver = new CommonsMultipartResolver();
-		filterMultipartResolver.setDefaultEncoding("UTF-8");
-		// resolver.setMaxUploadSize(512000);
-		return filterMultipartResolver;
-	}
-	*/
 }
