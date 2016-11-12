@@ -1,6 +1,3 @@
-/**
- * @author Mika Ropponen
- */
 package fi.softala.ttl.dao;
 
 import java.sql.Connection;
@@ -38,6 +35,9 @@ import fi.softala.ttl.model.User;
 import fi.softala.ttl.model.Waypoint;
 import fi.softala.ttl.model.Worksheet;
 
+/**
+ * @author Mika Ropponen | mika.ropponen@gmail.com
+ */
 @Component
 public class PassiDAOImpl implements PassiDAO {
 
@@ -75,9 +75,11 @@ public class PassiDAOImpl implements PassiDAO {
 				return null;
 			}
 		});
+		
 		if (user == null) {
 			return null;
 		}
+		
 		final String SQL2 = "SELECT groups.group_id, groups.group_name FROM groups "
 				+ "JOIN members ON members.group_id = groups.group_id "
 				+ "JOIN users ON members.user_id = users.user_id " + "WHERE users.user_id = ?";
@@ -91,10 +93,13 @@ public class PassiDAOImpl implements PassiDAO {
 				return group;
 			}
 		});
+		
 		user.setGroups(groups);
+		
 		final String SQL3 = "SELECT users.user_id, users.firstname, users.lastname, users.email, users.phone FROM users "
 				+ "JOIN members ON members.user_id = users.user_id "
 				+ "WHERE users.role_id = 2 AND members.group_id = ?";
+		
 		for (Group group : user.getGroups()) {
 			List<Instructor> instructors = jdbcTemplate.query(SQL3, new Object[] { group.getGroupID() },
 					new RowMapper<Instructor>() {
@@ -117,11 +122,11 @@ public class PassiDAOImpl implements PassiDAO {
 
 	// Get worksheets by group ID
 	public List<Category> getWorksheets(int groupID) {
-		
+
 		final String SQL1 = "SELECT categories.category_id, categories.category_name FROM categories";
-		
+
 		List<Category> categories = jdbcTemplate.query(SQL1, new RowMapper<Category>() {
-			
+
 			@Override
 			public Category mapRow(ResultSet rs, int rowNum) throws SQLException {
 				Category category = new Category();
@@ -130,62 +135,65 @@ public class PassiDAOImpl implements PassiDAO {
 				return category;
 			}
 		});
-		
+
 		final String SQL2 = "SELECT worksheets.worksheet_id, worksheets.header, "
 				+ "worksheets.preface, worksheets.planning FROM worksheets "
 				+ "JOIN distros ON distros.worksheet_id = worksheets.worksheet_id "
 				+ "JOIN categories ON worksheets.category_id = categories.category_id "
 				+ "WHERE distros.group_id = ? AND categories.category_id = ?";
-		
-		for (Category category : categories) {
-			
-			List<Worksheet> worksheets = new ArrayList<>();
-			worksheets = jdbcTemplate.query(SQL2, new Object[] { groupID, category.getCategoryID() }, new RowMapper<Worksheet>() {
 
-				@Override
-				public Worksheet mapRow(ResultSet rs, int rowNum) throws SQLException {
-					Worksheet worksheet = new Worksheet();
-					worksheet.setWorksheetID(rs.getInt("worksheet_id"));
-					worksheet.setWorksheetHeader(rs.getString("header"));
-					worksheet.setWorksheetPreface(rs.getString("preface"));
-					worksheet.setWorksheetPlanning(rs.getString("planning"));
-					return worksheet;
-				}
-			});
-			
+		for (Category category : categories) {
+
+			List<Worksheet> worksheets = new ArrayList<>();
+			worksheets = jdbcTemplate.query(SQL2, new Object[] { groupID, category.getCategoryID() },
+					new RowMapper<Worksheet>() {
+
+						@Override
+						public Worksheet mapRow(ResultSet rs, int rowNum) throws SQLException {
+							Worksheet worksheet = new Worksheet();
+							worksheet.setWorksheetID(rs.getInt("worksheet_id"));
+							worksheet.setWorksheetHeader(rs.getString("header"));
+							worksheet.setWorksheetPreface(rs.getString("preface"));
+							worksheet.setWorksheetPlanning(rs.getString("planning"));
+							return worksheet;
+						}
+					});
+
 			final String SQL3 = "SELECT waypoint_id, task, photo_enabled FROM waypoints WHERE worksheet_id = ?";
-			
+
 			List<Waypoint> waypoints = new ArrayList<>();
 			for (Worksheet worksheet : worksheets) {
-				waypoints = jdbcTemplate.query(SQL3, new Object[] { worksheet.getWorksheetID() }, new RowMapper<Waypoint>() {
+				waypoints = jdbcTemplate.query(SQL3, new Object[] { worksheet.getWorksheetID() },
+						new RowMapper<Waypoint>() {
 
-					@Override
-					public Waypoint mapRow(ResultSet rs, int rowNum) throws SQLException {
-						Waypoint waypoint = new Waypoint();
-						waypoint.setWaypointID(rs.getInt("waypoint_id"));
-						waypoint.setWaypointTask(rs.getString("task"));
-						waypoint.setWaypointPhotoEnabled(rs.getBoolean("photo_enabled"));
-						return waypoint;
-					}
-				});
+							@Override
+							public Waypoint mapRow(ResultSet rs, int rowNum) throws SQLException {
+								Waypoint waypoint = new Waypoint();
+								waypoint.setWaypointID(rs.getInt("waypoint_id"));
+								waypoint.setWaypointTask(rs.getString("task"));
+								waypoint.setWaypointPhotoEnabled(rs.getBoolean("photo_enabled"));
+								return waypoint;
+							}
+						});
 				worksheet.setWorksheetWaypoints(waypoints);
 			}
-			
+
 			final String SQL4 = "SELECT option_id, option_text FROM options WHERE waypoint_id = ?";
-			
+
 			List<Option> options = null;
 			for (Worksheet worksheet : worksheets) {
 				for (Waypoint waypoint : worksheet.getWorksheetWaypoints()) {
-					options = jdbcTemplate.query(SQL4, new Object[] { waypoint.getWaypointID() }, new RowMapper<Option>() {
+					options = jdbcTemplate.query(SQL4, new Object[] { waypoint.getWaypointID() },
+							new RowMapper<Option>() {
 
-						@Override
-						public Option mapRow(ResultSet rs, int rowNum) throws SQLException {
-							Option option = new Option();
-							option.setOptionID(rs.getInt("option_id"));
-							option.setOptionText(rs.getString("option_text"));
-							return option;
-						}
-					});
+								@Override
+								public Option mapRow(ResultSet rs, int rowNum) throws SQLException {
+									Option option = new Option();
+									option.setOptionID(rs.getInt("option_id"));
+									option.setOptionText(rs.getString("option_text"));
+									return option;
+								}
+							});
 					waypoint.setWaypointOptions(options);
 				}
 			}
@@ -203,11 +211,33 @@ public class PassiDAOImpl implements PassiDAO {
 		}
 		return false;
 	}
+	
+	// Delete answer
+	public boolean deleteAnswer(int worksheetID, int userID) {
+		DefaultTransactionDefinition paramTransactionDefinition = new DefaultTransactionDefinition();
+		TransactionStatus status = platformTransactionManager.getTransaction(paramTransactionDefinition);
+		try {
+			// Delete related waypoints
+			final String SQL1 = "DELETE FROM answerpoints WHERE answersheet_id = (SELECT answersheet_id FROM answersheets WHERE worksheet_id = ? AND user_id = ?)";
+			jdbcTemplate.update(SQL1, new Object[] { worksheetID, userID });
+			// Delete related answer
+			final String SQL2 = "DELETE FROM answersheets WHERE worksheet_id = ? AND user_id = ?";
+			jdbcTemplate.update(SQL2, new Object[] { worksheetID, userID });
+			// Commit transactions
+			platformTransactionManager.commit(status);
+		} catch (Exception e) {
+			platformTransactionManager.rollback(status);
+			return false;
+		}
+		return true;
+	}
 
 	// Save user answer
 	public boolean saveAnswer(Answersheet answersheet) {
+		
 		final String SQL1 = "INSERT INTO answersheets (answersheet_id, planning, instructor_comment, timestamp, worksheet_id, group_id, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
 		final String SQL2 = "INSERT INTO answerpoints (answerpoint_id, answer_text, instructor_comment, image_url, answersheet_id, waypoint_id, option_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+		
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 
 		DefaultTransactionDefinition paramTransactionDefinition = new DefaultTransactionDefinition();
@@ -227,7 +257,7 @@ public class PassiDAOImpl implements PassiDAO {
 					return ps;
 				}
 			}, keyHolder);
-			
+
 			final int ID = keyHolder.getKey().intValue();
 			answersheet.setAnswersheetID(ID);
 
@@ -250,82 +280,69 @@ public class PassiDAOImpl implements PassiDAO {
 					return answersheet.getAnswerpoints().size();
 				}
 			});
+			
 			platformTransactionManager.commit(status);
+			
 		} catch (Exception e) {
+			
 			platformTransactionManager.rollback(status);
 			return false;
 		}
+		
 		return true;
 	}
 
-	public boolean deleteAnswer(int worksheetID, int userID) {
-		DefaultTransactionDefinition paramTransactionDefinition = new DefaultTransactionDefinition();
-		TransactionStatus status = platformTransactionManager.getTransaction(paramTransactionDefinition);
-		try {
-			// Delete related waypoints
-			final String SQL1 = "DELETE FROM answerpoints WHERE answersheet_id = (SELECT answersheet_id FROM answersheets WHERE worksheet_id = ? AND user_id = ?)";
-			jdbcTemplate.update(SQL1, new Object[] { worksheetID, userID });
-			// Delete related answer
-			final String SQL2 = "DELETE FROM answersheets WHERE worksheet_id = ? AND user_id = ?";
-			jdbcTemplate.update(SQL2, new Object[] { worksheetID, userID });
-			// Commit transactions
-			platformTransactionManager.commit(status);
-		} catch (Exception e) {
-			platformTransactionManager.rollback(status);
-			return false;
-		}
-		return true;
-	}
-	
 	public Answersheet getAnswer(int worksheetID, int groupID, int userID) {
-		
+
 		final String SQL1 = "SELECT * FROM answersheets WHERE worksheet_id = ? AND group_id = ? AND user_id = ?";
 		final String SQL2 = "SELECT * FROM answerpoints "
-				+ "JOIN options ON answerpoints.option_id = options.option_id "
-				+ "WHERE answersheet_id = ?";
-		
-		Answersheet answersheet = null;
-		
-		try {
-			answersheet = jdbcTemplate.queryForObject(SQL1, new Object[] { worksheetID, groupID, userID }, new RowMapper<Answersheet>() {
+				+ "JOIN options ON answerpoints.option_id = options.option_id " + "WHERE answersheet_id = ?";
 
-				@Override
-				public Answersheet mapRow(ResultSet rs, int rowNum) throws SQLException {
-					Answersheet answersheet = new Answersheet();
-					answersheet.setAnswersheetID(rs.getInt("answersheet_id"));
-					answersheet.setPlanning(rs.getString("planning"));
-					answersheet.setInstructorComment(rs.getString("instructor_comment"));
-					answersheet.setTimestamp(rs.getTimestamp("timestamp"));
-					answersheet.setWorksheetID(rs.getInt("worksheet_id"));
-					answersheet.setGroupID(rs.getInt("group_id"));
-					answersheet.setUserID(rs.getInt("user_id"));
-					return answersheet;
-				}
-			});
+		Answersheet answersheet = null;
+
+		try {
+			answersheet = jdbcTemplate.queryForObject(SQL1, new Object[] { worksheetID, groupID, userID },
+					new RowMapper<Answersheet>() {
+
+						@Override
+						public Answersheet mapRow(ResultSet rs, int rowNum) throws SQLException {
+							Answersheet answersheet = new Answersheet();
+							answersheet.setAnswersheetID(rs.getInt("answersheet_id"));
+							answersheet.setPlanning(rs.getString("planning"));
+							answersheet.setInstructorComment(rs.getString("instructor_comment"));
+							answersheet.setTimestamp(rs.getTimestamp("timestamp"));
+							answersheet.setWorksheetID(rs.getInt("worksheet_id"));
+							answersheet.setGroupID(rs.getInt("group_id"));
+							answersheet.setUserID(rs.getInt("user_id"));
+							return answersheet;
+						}
+					});
 		} catch (Exception e) {
 			return null;
 		}
-		
-		List<Answerpoint> answerpoints = jdbcTemplate.query(SQL2, new Object[] { answersheet.getAnswersheetID() }, new RowMapper<Answerpoint>(){
-			
-			@Override
-			public Answerpoint mapRow(ResultSet rs, int rowNum) throws SQLException {
-				Answerpoint answerpoint = new Answerpoint();
-				answerpoint.setAnswerpointID(rs.getInt("answerpoint_id"));
-				answerpoint.setAnswerText(rs.getString("answer_text"));
-				answerpoint.setInstructorComment(rs.getString("instructor_comment"));
-				answerpoint.setInstructorRating(rs.getInt("instructor_rating"));
-				answerpoint.setImageURL(rs.getString("image_url"));
-				answerpoint.setAnswersheetID(rs.getInt("answersheet_id"));
-				answerpoint.setWaypointID(rs.getInt("waypoint_id"));
-				answerpoint.setOptionID(rs.getInt("option_id"));
-				answerpoint.setOptionText(rs.getString("option_text"));
-				return answerpoint;
-			}
-		});
-		
-		answersheet.setAnswerpoints((ArrayList<Answerpoint>) answerpoints); 
-		
+
+		List<Answerpoint> answerpoints = jdbcTemplate.query(SQL2, new Object[] { answersheet.getAnswersheetID() },
+				new RowMapper<Answerpoint>() {
+
+					@Override
+					public Answerpoint mapRow(ResultSet rs, int rowNum) throws SQLException {
+						Answerpoint answerpoint = new Answerpoint();
+						answerpoint.setAnswerpointID(rs.getInt("answerpoint_id"));
+						answerpoint.setAnswerText(rs.getString("answer_text"));
+						answerpoint.setInstructorComment(rs.getString("instructor_comment"));
+						answerpoint.setInstructorRating(rs.getInt("instructor_rating"));
+						answerpoint.setImageURL(rs.getString("image_url"));
+						answerpoint.setAnswersheetID(rs.getInt("answersheet_id"));
+						answerpoint.setWaypointID(rs.getInt("waypoint_id"));
+						answerpoint.setOptionID(rs.getInt("option_id"));
+						answerpoint.setOptionText(rs.getString("option_text"));
+						return answerpoint;
+					}
+
+				});
+
+		answersheet.setAnswerpoints((ArrayList<Answerpoint>) answerpoints);
+
 		return answersheet;
 	}
 
@@ -333,8 +350,8 @@ public class PassiDAOImpl implements PassiDAO {
 	@Override
 	public List<AuthUser> getAuthUsers() {
 		final String SQL = "SELECT username, password FROM users WHERE role_id = 1";
-		List<AuthUser> authUsers = jdbcTemplate.query(SQL, new RowMapper<AuthUser>(){
-			
+		List<AuthUser> authUsers = jdbcTemplate.query(SQL, new RowMapper<AuthUser>() {
+
 			@Override
 			public AuthUser mapRow(ResultSet rs, int rowNum) throws SQLException {
 				AuthUser authUser = new AuthUser();

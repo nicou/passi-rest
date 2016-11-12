@@ -43,7 +43,8 @@ public class ScheduledTasks {
    	}
     
    	/**
-   	 * Method executes scheduled check if authentication users are up to date with database
+   	 * Method executes scheduled check if authentication users are up to date with database.
+   	 * This may also fix the unexpected loss of data in memory and fetch manually added users from database.
    	 */
     @Scheduled(fixedRate = (15 * 60 * 1000)) // 15 minutes
     public void loadAuthUsers() {

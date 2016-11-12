@@ -96,4 +96,10 @@ public class User implements Serializable {
 	public void setGroups(List<Group> groups) {
 		this.groups = groups;
 	}
+
+	@Override
+	public String toString() {
+		return "User [userID=" + userID + ", username=" + username + ", firstname=" + firstname + ", lastname="
+				+ lastname + ", email=" + email + ", phone=" + phone + ", groups=" + groups + "]";
+	}
 }

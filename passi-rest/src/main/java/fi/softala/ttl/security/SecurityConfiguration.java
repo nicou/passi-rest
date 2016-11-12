@@ -2,8 +2,8 @@ package fi.softala.ttl.security;
 
 import java.util.Properties;
 
-import javax.inject.Inject;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,40 +19,37 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
-import fi.softala.ttl.dao.PassiDAO;
 import fi.softala.ttl.model.AuthUser;
- 
+import fi.softala.ttl.service.PassiService;
+
+/**
+ * @author Mika Ropponen | mika.ropponen@gmail.com
+ */
 @Configuration
 @PropertySource("classpath:data.properties")
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+	
+	private static final Logger log = LoggerFactory.getLogger(SecurityConfiguration.class);
  
     private static String REALM = "PASSI_REALM";
     
-    @Inject
-	private PassiDAO dao;
-
-	public PassiDAO getDao() {
-		return dao;
-	}
-
-	public void setDao(PassiDAO dao) {
-		this.dao = dao;
-	}
+    // Injected service accountable for data persistence.
+ 	@Autowired
+ 	PassiService passiService;
 	
     @Autowired
     public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception {
     	auth.userDetailsService(inMemoryUserDetailsManager()).passwordEncoder(passwordEncoder());
-    	// inMemoryUserDetailsManager.createUser(new User(authUser.getUsername(), authUser.getPassword(), Collections.singleton(new SimpleGrantedAuthority("USER"))));
-    	// auth.inMemoryAuthentication().passwordEncoder(passwordEncoder()).withUser(authUser.getUsername()).password(authUser.getPassword()).roles("USER");
     }
     
     @Bean
     public InMemoryUserDetailsManager inMemoryUserDetailsManager() {
         final Properties users = new Properties();
-    	for (AuthUser authUser : dao.getAuthUsers()) {
-    		users.put(authUser.getUsername(), authUser.getPassword() + ",ROLE_USER,enabled"); //add whatever other user you need
+    	for (AuthUser authUser : passiService.getAuthUsers()) {
+    		users.put(authUser.getUsername(), authUser.getPassword() + ",ROLE_USER,enabled");
     	}
+    	log.info("inMemoryUserDetailsManager() - Authentication users fetched from database");
         return new InMemoryUserDetailsManager(users);
     }
     
