@@ -28,12 +28,8 @@ public class ScheduledTasks {
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
     
-    private InMemoryUserDetailsManager inMemoryUserDetailsManager;
-
     @Autowired
-    public void SimpleSecurityController(InMemoryUserDetailsManager inMemoryUserDetailsManager) {
-       this.inMemoryUserDetailsManager = inMemoryUserDetailsManager;
-    }
+    private InMemoryUserDetailsManager inMemoryUserDetailsManager;
     
     @Inject
    	private PassiDAO dao;
