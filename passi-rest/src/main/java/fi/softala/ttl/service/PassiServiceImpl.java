@@ -124,6 +124,7 @@ public class PassiServiceImpl implements PassiService {
 	 * @return boolean (success or not)
 	 */
 	@Override
+	@Transactional(readOnly = true, isolation = Isolation.SERIALIZABLE)
 	public boolean deleteAnswer(int worksheetID, int userID) {
 		return dao.deleteAnswer(worksheetID, userID);
 	}

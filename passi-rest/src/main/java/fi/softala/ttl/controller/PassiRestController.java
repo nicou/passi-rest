@@ -85,7 +85,7 @@ public class PassiRestController {
 		User user = passiService.findUser(username);
 		if (user == null)
 			throw new UserNotFoundException(username);
-		log.debug("Requested user found for JSON response - User: {}", user);
+		log.info("Requested user found for JSON response - User: {}", user);
 		return new ResponseEntity<User>(user, HttpStatus.OK);
 	}
 
@@ -100,7 +100,7 @@ public class PassiRestController {
 		List<Category> categorizedWorksheets = passiService.getWorksheets(groupID);
 		if (categorizedWorksheets.size() == 0)
 			throw new WorksheetNotFoundException(groupID);
-		log.debug("Requested categorized worksheets List<Category> found for JSON response");
+		log.info("Requested categorized worksheets List<Category> found for JSON response");
 		return new ResponseEntity<List<Category>>(categorizedWorksheets, HttpStatus.OK);
 	}
 
