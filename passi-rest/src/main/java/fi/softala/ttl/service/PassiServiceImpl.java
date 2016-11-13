@@ -18,8 +18,8 @@ import fi.softala.ttl.model.User;
  * @author Mika Ropponen | mika.ropponen@gmail.com
  * 
  * The main service responsible for the data persistence and transaction
- * rollbacks Class level @Transactional ensures that unannotated methods use the
- * default values of transaction.
+ * rollbacks. Class level annotation @Transactional ensures that possible
+ * unannotated methods use the default values of transaction.
  * 
  * Default propagation = Propagation.REQUIRED used for transactions - no need
  * for higher level.
@@ -90,7 +90,7 @@ public class PassiServiceImpl implements PassiService {
 	}
 
 	/**
-	 * Return boolean, if the user has answer to a worksheet or not
+	 * Return boolean, if the user has answered to a worksheet or not
 	 * 
 	 * @param worksheetID
 	 * @param userID
@@ -103,8 +103,8 @@ public class PassiServiceImpl implements PassiService {
 	}
 
 	/**
-	 * Save answers of one worksheet. Exceptions and rollback handled in
-	 * dao.saveAnswer() method.
+	 * Save answers of one worksheet. Exceptions and rollback handled locally in
+	 * PassiDAOImpl.saveAnswer() method.
 	 * 
 	 * @param answersheet
 	 * @return boolean (success or not)
@@ -116,8 +116,8 @@ public class PassiServiceImpl implements PassiService {
 	}
 
 	/**
-	 * Delete answers of one worksheet. Exceptions and rollback handled in
-	 * dao.saveAnswer() method.
+	 * Delete answers of one worksheet. Exceptions and rollback handled locally
+	 * in PassiDAOImpl.saveAnswer() method.
 	 * 
 	 * @param worksheetID
 	 * @param userID

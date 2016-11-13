@@ -78,14 +78,14 @@ public class PassiRestController {
 	 * 
 	 * @param username
 	 * @return User as JSON including user data, user's groups, groups'
-	 * instructors
+	 * instructors; HttpStatus
 	 */
 	@RequestMapping(value = "/user/{username}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<User> getUser(@PathVariable("username") String username) {
 		User user = passiService.findUser(username);
 		if (user == null)
 			throw new UserNotFoundException(username);
-		log.info("Requested user found for JSON response - User: {}", user);
+		log.info("getUser() : Requested user found for JSON response - User: {}", user);
 		return new ResponseEntity<User>(user, HttpStatus.OK);
 	}
 
@@ -93,19 +93,19 @@ public class PassiRestController {
 	 * Get worksheets by group ID. Worksheets are sorted into categories.
 	 * 
 	 * @param groupID
-	 * @return List<Category> as JSON including Worksheets, Waypoints, Options
+	 * @return List<Category> as JSON including Worksheets, Waypoints, Options; HttpStatus
 	 */
 	@RequestMapping(value = "/worksheet/{group}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<Category>> getWorksheets(@PathVariable("group") int groupID) {
 		List<Category> categorizedWorksheets = passiService.getWorksheets(groupID);
 		if (categorizedWorksheets.size() == 0)
 			throw new WorksheetNotFoundException(groupID);
-		log.info("Requested categorized worksheets List<Category> found for JSON response");
+		log.info("getWorksheets() : Requested categorized worksheets List<Category> found for JSON response");
 		return new ResponseEntity<List<Category>>(categorizedWorksheets, HttpStatus.OK);
 	}
 
 	/**
-	 * Save student answers
+	 * Save student answers.
 	 * 
 	 * @param answersheet JSON from the client
 	 * @return String message, HttpStatus
@@ -128,7 +128,7 @@ public class PassiRestController {
 	}
 
 	/**
-	 * Get student answers
+	 * Get student answers by worksheetID, groupID and userID.
 	 * 
 	 * @param worksheetID
 	 * @param groupID
@@ -146,7 +146,7 @@ public class PassiRestController {
 
 	/**
 	 * Delete student answers. Tool for mobile client development. Supposed to
-	 * be removed when not need anymore.
+	 * be removed when not needed anymore.
 	 * 
 	 * @param worksheetID
 	 * @param userID
@@ -193,16 +193,16 @@ public class PassiRestController {
 				File serverFile = new File(dir.getAbsolutePath() + File.separator + file + ".jpg");
 				BufferedImage image = ImageIO.read(new ByteArrayInputStream(payload));
 				ImageIO.write(image, "JPG", serverFile);
-				message = "You successfully uploaded file " + file + ".";
+				message = "You successfully uploaded file " + file + ".jpg.";
 				return new ResponseEntity<String>(message, HttpStatus.OK);
 			} catch (Exception e) {
-				message = "You failed to upload file " + file + ".";
+				message = "You failed to upload file " + file + ".jpg.";
 				return new ResponseEntity<String>(message, HttpStatus.BAD_REQUEST);
 			} finally {
 				IOUtils.closeQuietly(stream);
 			}
 		} else {
-			message = "You failed to upload " + file + " because the file was empty.";
+			message = "You failed to upload " + file + ".jpg because the file was empty.";
 			return new ResponseEntity<String>(message, HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -233,7 +233,6 @@ public class PassiRestController {
 		int worksheet = e.getWorksheetID();
 		int group = e.getGroupID();
 		int user = e.getUserID();
-		return new Error(
-				"Answers for worksheet [" + worksheet + "], group [" + group + "] and user [" + user + "] not found.");
+		return new Error("Answers for worksheet [" + worksheet + "], group [" + group + "] and user [" + user + "] not found.");
 	}
 }
