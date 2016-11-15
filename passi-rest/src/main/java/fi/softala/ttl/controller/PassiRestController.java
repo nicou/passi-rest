@@ -39,8 +39,8 @@ import fi.softala.ttl.exception.WorksheetNotFoundException;
  * 
  * The main controller of Passi REST Service for Android mobile client. Due to
  * absence of SSL/TLS secured connection and light authentication all CRUD
- * methods are not available. Update and delete methods are not available if not
- * necessary for the mobile client.
+ * methods are not available. Update and delete methods are available only if
+ * they are necessary for the mobile client.
  */
 @RestController
 public class PassiRestController {
