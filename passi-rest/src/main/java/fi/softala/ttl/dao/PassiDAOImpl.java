@@ -98,7 +98,8 @@ public class PassiDAOImpl implements PassiDAO {
 		
 		final String SQL3 = "SELECT users.user_id, users.firstname, users.lastname, users.email, users.phone FROM users "
 				+ "JOIN members ON members.user_id = users.user_id "
-				+ "WHERE users.role_id = 2 AND members.group_id = ?";
+				+ "JOIN user_role ON user_role.user_id = users.user_id "
+				+ "WHERE user_role.role_id = 2 AND members.group_id = ?";
 		
 		for (Group group : user.getGroups()) {
 			List<Instructor> instructors = jdbcTemplate.query(SQL3, new Object[] { group.getGroupID() },
