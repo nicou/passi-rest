@@ -79,7 +79,8 @@ public class PassiDAOImpl implements PassiDAO {
 		}
 		final String SQL2 = "SELECT groups.group_id, groups.group_name FROM groups "
 				+ "JOIN members ON members.group_id = groups.group_id "
-				+ "JOIN users ON members.user_id = users.user_id " + "WHERE users.user_id = ?";
+				+ "JOIN users ON members.user_id = users.user_id " 
+				+ "WHERE users.user_id = ?";
 		List<Group> groups = jdbcTemplate.query(SQL2, new Object[] { user.getUserID() }, new RowMapper<Group>() {
 
 			@Override
@@ -93,7 +94,8 @@ public class PassiDAOImpl implements PassiDAO {
 		user.setGroups(groups);
 		final String SQL3 = "SELECT users.user_id, users.firstname, users.lastname, users.email, users.phone FROM users "
 				+ "JOIN members ON members.user_id = users.user_id "
-				+ "WHERE users.role_id = 2 AND members.group_id = ?";
+				+ "JOIN user_role ON user_role.user_id = users.user_id "
+				+ "WHERE user_role.role_id = 2 AND members.group_id = ?";
 		for (Group group : user.getGroups()) {
 			List<Instructor> instructors = jdbcTemplate.query(SQL3, new Object[] { group.getGroupID() },
 					new RowMapper<Instructor>() {
