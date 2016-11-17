@@ -51,4 +51,10 @@ public class Group implements Serializable {
 	public void setGroupInstructors(List<Instructor> groupInstructors) {
 		this.groupInstructors = groupInstructors;
 	}
+
+	@Override
+	public String toString() {
+		return "Group [groupID=" + groupID + ", groupName=" + groupName + ", groupInstructors=" + groupInstructors
+				+ "]";
+	}
 }
