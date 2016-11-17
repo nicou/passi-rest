@@ -65,7 +65,7 @@ public class PassiRestController {
 	/**
 	 * Service start up.
 	 * 
-	 * @return This is the flag showing the service is up and running in
+	 * @return This is the flag showing the service is up and running
 	 * http://server/passi-rest
 	 */
 	@RequestMapping(value = "/", method = RequestMethod.GET)
@@ -124,7 +124,6 @@ public class PassiRestController {
 			message = "Save answers interrupted for unknown reason. No changes to database.";
 			return new ResponseEntity<String>(message, HttpStatus.EXPECTATION_FAILED);
 		}
-
 	}
 
 	/**
