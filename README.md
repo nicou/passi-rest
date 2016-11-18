@@ -1,10 +1,10 @@
-# passi-rest
-
-Name: Työkykypassi - Working Ability Card
+# Työkykypassi - Working Ability Card
 
 Client: Finnish Institute of Occupation Health
 
 Discription: Application for enhancing well-being, occupational health and environment of professionals in different areas.
+
+Project type: Open source 
 
 Consistence:
    - Android native mobile application for end-users
