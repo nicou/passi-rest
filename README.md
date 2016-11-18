@@ -1,6 +1,6 @@
 # Työkykypassi - Working Ability Card
 
-Client: Finnish Institute of Occupation Health
+Client: Finnish Institute of Occupational Health
 
 Discription: Application for enhancing well-being, occupational health and environment of professionals in different areas.
 
