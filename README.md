@@ -8,7 +8,7 @@ Project type: Open source
 
 Consistence:
    - Android native mobile application for end-users
-   - RESTful Web Service backend for mobile client **this repository**
+   - RESTful Web Service backend for mobile client **(this repository)**
    - MVC Web Application for group instructors
 
 Mobile client technologies:
