@@ -129,4 +129,16 @@ public class PassiServiceImpl implements PassiService {
 		return dao.deleteAnswer(worksheetID, userID);
 	}
 
+	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
+	public boolean isGroupExist(String key) {
+		return dao.isGroupExist(key);
+	}
+
+	@Override
+	@Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE)
+	public boolean joinUserIntoGroup(String key, int userID) {
+		return dao.joinUserIntoGroup(key, userID);
+	}
+
 }

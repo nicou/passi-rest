@@ -28,4 +28,8 @@ public interface PassiService {
 	
 	public boolean isAnswerExist(int worksheetID, int userID);
 	
+	public boolean isGroupExist(String key);
+	
+	public boolean joinUserIntoGroup(String key, int userID);
+	
 }

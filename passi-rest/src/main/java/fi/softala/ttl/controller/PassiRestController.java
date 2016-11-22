@@ -167,6 +167,25 @@ public class PassiRestController {
 			return new ResponseEntity<String>(message, HttpStatus.EXPECTATION_FAILED);
 		}
 	}
+	
+	/**
+	 * Join group with key string
+	 * 
+	 * @param key String to join a group, given by group instructor 
+	 * @return HttpStatus
+	 */
+	@RequestMapping(value = "/join/{key}/{user}", method = RequestMethod.GET)
+	public ResponseEntity<Void> joinGroup(
+			@PathVariable("user") int userID,
+			@PathVariable("key") String key) {
+		if (!passiService.isGroupExist(key)) {
+			return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
+		}
+		if (!passiService.joinUserIntoGroup(key, userID)) {
+			return new ResponseEntity<Void>(HttpStatus.CONFLICT);
+		}
+		return new ResponseEntity<Void>(HttpStatus.OK);
+	}
 
 	/**
 	 * Single JPEG image file upload as raw binary for hign-performance upload

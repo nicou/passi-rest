@@ -350,7 +350,9 @@ public class PassiDAOImpl implements PassiDAO {
 	// Get all instructor users for basic authentication
 	@Override
 	public List<AuthUser> getAuthUsers() {
-		final String SQL = "SELECT username, password FROM users WHERE role_id = 1";
+		final String SQL = "SELECT username, password FROM users "
+				+ "JOIN user_role ON users.user_id = user_role.user_id "
+				+ "WHERE role_id = 1";
 		List<AuthUser> authUsers = jdbcTemplate.query(SQL, new RowMapper<AuthUser>() {
 
 			@Override
@@ -362,5 +364,28 @@ public class PassiDAOImpl implements PassiDAO {
 			}
 		});
 		return authUsers;
+	}
+
+	@Override
+	public boolean isGroupExist(String key) {
+		final String SQL = "SELECT EXISTS (SELECT 1 FROM groups WHERE group_key = ?)";
+		int exists = jdbcTemplate.queryForObject(SQL, new Object[] { key }, Integer.class);
+		if (exists == 1) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean joinUserIntoGroup(String key, int userID) {
+		final String SQL1 = "SELECT group_id FROM groups WHERE group_key = ?";
+		final String SQL2 = "INSERT INTO members (user_id, group_id) VALUES (?, ?)";
+		try {
+			int groupID = jdbcTemplate.queryForObject(SQL1, new Object[] { key }, Integer.class);
+			jdbcTemplate.update(SQL2, new Object[] { userID, groupID });
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
 	}
 }

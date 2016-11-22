@@ -25,4 +25,9 @@ public interface PassiDAO {
 	public Answersheet getAnswer(int worksheetID, int groupID, int userID);
 	
 	public List<AuthUser> getAuthUsers();
+	
+	public boolean isGroupExist(String key);
+	
+	public boolean joinUserIntoGroup(String key, int UserID);
+	
 }
