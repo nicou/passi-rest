@@ -30,7 +30,6 @@ import fi.softala.ttl.model.Answersheet;
 import fi.softala.ttl.model.AuthUser;
 import fi.softala.ttl.model.Category;
 import fi.softala.ttl.model.Group;
-import fi.softala.ttl.model.Instructor;
 import fi.softala.ttl.model.User;
 import fi.softala.ttl.model.Waypoint;
 import fi.softala.ttl.model.Worksheet;
@@ -102,18 +101,18 @@ public class PassiDAOImpl implements PassiDAO {
 				+ "WHERE user_role.role_id = 2 AND members.group_id = ?";
 		
 		for (Group group : user.getGroups()) {
-			List<Instructor> instructors = jdbcTemplate.query(SQL3, new Object[] { group.getGroupID() },
-					new RowMapper<Instructor>() {
+			List<User> instructors = jdbcTemplate.query(SQL3, new Object[] { group.getGroupID() },
+					new RowMapper<User>() {
 
 						@Override
-						public Instructor mapRow(ResultSet rs, int rowNum) throws SQLException {
-							Instructor instructor = new Instructor();
-							instructor.setUserID(rs.getInt("user_id"));
-							instructor.setFirstname(rs.getString("firstname"));
-							instructor.setLastname(rs.getString("lastname"));
-							instructor.setEmail(rs.getString("email"));
-							instructor.setPhone(rs.getString("phone"));
-							return instructor;
+						public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+							User user = new User();
+							user.setUserID(rs.getInt("user_id"));
+							user.setFirstname(rs.getString("firstname"));
+							user.setLastname(rs.getString("lastname"));
+							user.setEmail(rs.getString("email"));
+							user.setPhone(rs.getString("phone"));
+							return user;
 						}
 					});
 			group.setGroupInstructors(instructors);

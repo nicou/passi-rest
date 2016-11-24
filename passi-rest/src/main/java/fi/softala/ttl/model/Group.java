@@ -12,7 +12,7 @@ public class Group implements Serializable {
 	
 	private String groupID;
 	private String groupName;
-	private List<Instructor> groupInstructors;
+	private List<User> groupInstructors;
 	
 	public Group() {
 		super();
@@ -21,7 +21,7 @@ public class Group implements Serializable {
 		this.groupInstructors = null;
 	}
 
-	public Group(String groupID, String groupName, List<Instructor> groupInstructors) {
+	public Group(String groupID, String groupName, List<User> groupInstructors) {
 		super();
 		this.groupID = groupID;
 		this.groupName = groupName;
@@ -44,11 +44,11 @@ public class Group implements Serializable {
 		this.groupName = groupName;
 	}
 
-	public List<Instructor> getGroupInstructors() {
+	public List<User> getGroupInstructors() {
 		return groupInstructors;
 	}
 
-	public void setGroupInstructors(List<Instructor> groupInstructors) {
+	public void setGroupInstructors(List<User> groupInstructors) {
 		this.groupInstructors = groupInstructors;
 	}
 
