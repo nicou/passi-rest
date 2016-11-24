@@ -99,7 +99,7 @@ public class PassiRestController {
 		if (!passiService.addUser(user)) {
 			return new ResponseEntity<Void>(HttpStatus.EXPECTATION_FAILED);
 		}
-		log.debug("registerUser() : User successfully registered - User: {}", user);
+		log.debug("registerUser() : User successfully registered");
 		return new ResponseEntity<Void>(HttpStatus.OK);
 	}
 
