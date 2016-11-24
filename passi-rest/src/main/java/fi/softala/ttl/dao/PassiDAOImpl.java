@@ -127,7 +127,7 @@ public class PassiDAOImpl implements PassiDAO {
 	 * User registration. 
 	 * 
 	 * @param AuthUser user : new user object
-	 * @return boolean : false if any exceptions else true
+	 * @return boolean : false if any exceptions occur else true
 	 */
 	@Override
 	public boolean addUser(AuthUser user) {
