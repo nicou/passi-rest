@@ -151,11 +151,9 @@ public class PassiDAOImpl implements PassiDAO {
 				}
 			}, keyHolder);
 			
-			System.out.println("User added to DB");
 			int userID = keyHolder.getKey().intValue();
-			System.out.println("KeyHolder = " + userID);
 			jdbcTemplate.update(SQL2, new Object[] { userID });
-			System.out.println("Role inserted");
+			
 		} catch (Exception e) {
 			return false;
 		}
