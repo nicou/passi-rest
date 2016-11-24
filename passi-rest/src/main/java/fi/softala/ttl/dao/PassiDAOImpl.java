@@ -19,6 +19,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -39,6 +40,8 @@ import fi.softala.ttl.model.Worksheet;
  */
 @Component
 public class PassiDAOImpl implements PassiDAO {
+	
+	private static final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 	@Inject
 	private JdbcTemplate jdbcTemplate;
@@ -118,6 +121,45 @@ public class PassiDAOImpl implements PassiDAO {
 			group.setGroupInstructors(instructors);
 		}
 		return user;
+	}
+
+	/**
+	 * User registration
+	 */
+	@Override
+	public boolean addUser(AuthUser user) {
+		
+		final String SQL1 = "INSERT INTO users (username, password, firstname, lastname, email, phone) VALUES (?, ?, ?, ?, ?, ?)";
+		final String SQL2 = "INSERT INTO user_role (user_id, role_id) VALUES (?, 1)";
+		
+		KeyHolder keyHolder = new GeneratedKeyHolder();
+		
+		try {
+			
+			jdbcTemplate.update(new PreparedStatementCreator() {
+				
+				public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+					
+					PreparedStatement ps = connection.prepareStatement(SQL1, new String[] { "user_id" });
+					ps.setString(1, user.getUsername());
+					ps.setString(2, passwordEncoder.encode(user.getPassword()));
+					ps.setString(3, user.getFirstname());
+					ps.setString(4, user.getLastname());
+					ps.setString(5, user.getEmail());
+					ps.setString(6, user.getPhone());
+					return ps;
+				}
+			}, keyHolder);
+			
+			System.out.println("User added to DB");
+			int userID = keyHolder.getKey().intValue();
+			System.out.println("KeyHolder = " + userID);
+			jdbcTemplate.update(SQL2, new Object[] { userID });
+			System.out.println("Role inserted");
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
 	}
 
 	// Get worksheets by group ID

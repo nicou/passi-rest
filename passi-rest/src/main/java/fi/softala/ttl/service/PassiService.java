@@ -16,6 +16,8 @@ public interface PassiService {
 	
 	public List<AuthUser> getAuthUsers();
 	
+	public boolean addUser(AuthUser user);
+	
 	public User findUser(String username);
 	
 	public List<Category> getWorksheets(int groupID);

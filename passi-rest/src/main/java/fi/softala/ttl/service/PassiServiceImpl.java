@@ -50,6 +50,11 @@ public class PassiServiceImpl implements PassiService {
 		return dao.getAuthUsers();
 	}
 
+	@Override
+	public boolean addUser(AuthUser user) {
+		return dao.addUser(user);
+	}
+
 	/**
 	 * Lower isolation is used for findUser(). findUser() is not used for
 	 * authentication.
@@ -140,5 +145,4 @@ public class PassiServiceImpl implements PassiService {
 	public boolean joinUserIntoGroup(String key, int userID) {
 		return dao.joinUserIntoGroup(key, userID);
 	}
-
 }

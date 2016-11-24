@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import fi.softala.ttl.model.Answersheet;
+import fi.softala.ttl.model.AuthUser;
 import fi.softala.ttl.model.Category;
 import fi.softala.ttl.model.User;
 import fi.softala.ttl.service.PassiService;
@@ -85,8 +86,21 @@ public class PassiRestController {
 		User user = passiService.findUser(username);
 		if (user == null)
 			throw new UserNotFoundException(username);
-		log.info("getUser() : Requested user found for JSON response - User: {}", user);
+		log.debug("getUser() : Requested user found for JSON response - User: {}", user);
 		return new ResponseEntity<User>(user, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/register/", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Void> registerUser(@RequestBody AuthUser user) {
+		User userData = passiService.findUser(user.getUsername());
+		if (userData != null) {
+			return new ResponseEntity<Void>(HttpStatus.CONFLICT);
+		}
+		if (!passiService.addUser(user)) {
+			return new ResponseEntity<Void>(HttpStatus.EXPECTATION_FAILED);
+		}
+		log.debug("registerUser() : User successfully registered - User: {}", user);
+		return new ResponseEntity<Void>(HttpStatus.OK);
 	}
 
 	/**
@@ -100,7 +114,7 @@ public class PassiRestController {
 		List<Category> categorizedWorksheets = passiService.getWorksheets(groupID);
 		if (categorizedWorksheets.size() == 0)
 			throw new WorksheetNotFoundException(groupID);
-		log.info("getWorksheets() : Requested categorized worksheets List<Category> found for JSON response");
+		log.debug("getWorksheets() : Requested categorized worksheets List<Category> found for JSON response");
 		return new ResponseEntity<List<Category>>(categorizedWorksheets, HttpStatus.OK);
 	}
 

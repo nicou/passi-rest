@@ -16,17 +16,10 @@ public class User implements Serializable {
 	private String lastname;
 	private String email;
 	private String phone;
-	
 	private List<Group> groups;
 
 	public User() {
 		super();
-		this.userID = 0;
-		this.username = "";
-		this.firstname = "";
-		this.lastname = "";
-		this.email = "";
-		this.phone = "";
 	}
 
 	public User(int userID, String username, String firstname, String lastname, String email, String phone,
