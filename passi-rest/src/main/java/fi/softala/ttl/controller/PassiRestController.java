@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -17,6 +18,9 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,6 +51,7 @@ import fi.softala.ttl.exception.WorksheetNotFoundException;
 public class PassiRestController {
 
 	private static final Logger log = LoggerFactory.getLogger(PassiRestController.class);
+	private static final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 	@Inject
 	private PassiDAO dao;
@@ -62,6 +67,9 @@ public class PassiRestController {
 	// Injected service accountable for data persistence.
 	@Autowired
 	PassiService passiService;
+	
+	@Autowired
+    private InMemoryUserDetailsManager inMemoryUserDetailsManager;
 
 	/**
 	 * Service start up.
@@ -99,7 +107,10 @@ public class PassiRestController {
 		if (!passiService.addUser(user)) {
 			return new ResponseEntity<Void>(HttpStatus.EXPECTATION_FAILED);
 		}
-		log.debug("registerUser() : User successfully registered");
+		// Add new user to in-memory authentication users
+		inMemoryUserDetailsManager.createUser(new org.springframework.security.core.userdetails.User(user.getUsername(), 
+				passwordEncoder.encode(user.getPassword()), Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))));
+		log.debug("registerUser() : User successfully registered and added to authetication users");
 		return new ResponseEntity<Void>(HttpStatus.OK);
 	}
 

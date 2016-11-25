@@ -50,7 +50,8 @@ public class ScheduledTasks {
     public void loadAuthUsers() {
     	for (AuthUser authUser : dao.getAuthUsers()) {
     		if (!inMemoryUserDetailsManager.userExists(authUser.getUsername())) {
-    			inMemoryUserDetailsManager.createUser(new User(authUser.getUsername(), authUser.getPassword(), Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))));   		}
+    			inMemoryUserDetailsManager.createUser(new User(authUser.getUsername(), authUser.getPassword(), Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))));
+    		}
     	}
         log.info("Scheduled loading of new authorization users {}", dateFormat.format(new Date()));
     }
