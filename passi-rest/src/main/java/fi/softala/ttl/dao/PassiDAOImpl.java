@@ -130,7 +130,7 @@ public class PassiDAOImpl implements PassiDAO {
 	@Override
 	public boolean addUser(AuthUser user) {
 		
-		final String SQL1 = "INSERT INTO users (username, password, firstname, lastname, email) VALUES (?, ?, ?, ?, ?, ?)";
+		final String SQL1 = "INSERT INTO users (username, password, firstname, lastname, email) VALUES (?, ?, ?, ?, ?)";
 		final String SQL2 = "INSERT INTO user_role (user_id, role_id) VALUES (?, 1)";
 		
 		KeyHolder keyHolder = new GeneratedKeyHolder();
