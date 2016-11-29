@@ -59,7 +59,7 @@ public class PassiDAOImpl implements PassiDAO {
 
 	// Find and return user with all related data
 	public User findUser(String username) {
-		final String SQL1 = "SELECT user_id, username, firstname, lastname, email, phone FROM users WHERE username = ?";
+		final String SQL1 = "SELECT user_id, username, firstname, lastname, email FROM users WHERE username = ?";
 		User user = jdbcTemplate.query(SQL1, new Object[] { username }, new ResultSetExtractor<User>() {
 
 			@Override
@@ -71,7 +71,6 @@ public class PassiDAOImpl implements PassiDAO {
 					user.setFirstname(rs.getString("firstname"));
 					user.setLastname(rs.getString("lastname"));
 					user.setEmail(rs.getString("email"));
-					user.setPhone(rs.getString("phone"));
 					return user;
 				}
 				return null;
@@ -98,7 +97,7 @@ public class PassiDAOImpl implements PassiDAO {
 		
 		user.setGroups(groups);
 		
-		final String SQL3 = "SELECT users.user_id, users.firstname, users.lastname, users.email, users.phone FROM users "
+		final String SQL3 = "SELECT users.user_id, users.firstname, users.lastname, users.email FROM users "
 				+ "JOIN members ON members.user_id = users.user_id "
 				+ "JOIN user_role ON user_role.user_id = users.user_id "
 				+ "WHERE user_role.role_id = 2 AND members.group_id = ?";
@@ -114,7 +113,6 @@ public class PassiDAOImpl implements PassiDAO {
 							user.setFirstname(rs.getString("firstname"));
 							user.setLastname(rs.getString("lastname"));
 							user.setEmail(rs.getString("email"));
-							user.setPhone(rs.getString("phone"));
 							return user;
 						}
 					});
@@ -132,7 +130,7 @@ public class PassiDAOImpl implements PassiDAO {
 	@Override
 	public boolean addUser(AuthUser user) {
 		
-		final String SQL1 = "INSERT INTO users (username, password, firstname, lastname, email, phone) VALUES (?, ?, ?, ?, ?, ?)";
+		final String SQL1 = "INSERT INTO users (username, password, firstname, lastname, email) VALUES (?, ?, ?, ?, ?, ?)";
 		final String SQL2 = "INSERT INTO user_role (user_id, role_id) VALUES (?, 1)";
 		
 		KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -149,7 +147,6 @@ public class PassiDAOImpl implements PassiDAO {
 					ps.setString(3, user.getFirstname());
 					ps.setString(4, user.getLastname());
 					ps.setString(5, user.getEmail());
-					ps.setString(6, user.getPhone());
 					return ps;
 				}
 			}, keyHolder);

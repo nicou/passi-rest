@@ -16,7 +16,6 @@ public class MemberRowMapper implements RowMapper<User> {
 		user.setFirstname(rs.getString("firstname"));
 		user.setLastname(rs.getString("lastname"));
 		user.setEmail(rs.getString("email"));
-		user.setPhone(rs.getString("phone"));
 		return user;
 	}
 }

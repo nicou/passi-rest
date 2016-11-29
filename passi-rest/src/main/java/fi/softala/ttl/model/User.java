@@ -15,7 +15,6 @@ public class User implements Serializable {
 	private String firstname;
 	private String lastname;
 	private String email;
-	private String phone;
 	private List<Group> groups;
 
 	public User() {
@@ -30,7 +29,6 @@ public class User implements Serializable {
 		this.firstname = firstname;
 		this.lastname = lastname;
 		this.email = email;
-		this.phone = phone;
 		this.groups = groups;
 	}
 
@@ -74,14 +72,6 @@ public class User implements Serializable {
 		this.email = email;
 	}
 
-	public String getPhone() {
-		return phone;
-	}
-
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
-
 	public List<Group> getGroups() {
 		return groups;
 	}
@@ -93,6 +83,6 @@ public class User implements Serializable {
 	@Override
 	public String toString() {
 		return "User [userID=" + userID + ", username=" + username + ", firstname=" + firstname + ", lastname="
-				+ lastname + ", email=" + email + ", phone=" + phone + ", groups=" + groups + "]";
+				+ lastname + ", email=" + email + ", groups=" + groups + "]";
 	}
 }
