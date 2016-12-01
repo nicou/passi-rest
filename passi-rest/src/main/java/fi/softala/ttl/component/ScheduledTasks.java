@@ -1,6 +1,4 @@
-/**
- *  @author Mika Ropponen
- */
+/*
 package fi.softala.ttl.component;
 
 import java.text.SimpleDateFormat;
@@ -42,10 +40,6 @@ public class ScheduledTasks {
    		this.dao = dao;
    	}
     
-   	/**
-   	 * Method executes scheduled check if authentication users are up to date with database.
-   	 * This may also fix the unexpected loss of data in memory and fetch manually added users from database.
-   	 */
     @Scheduled(fixedRate = (15 * 60 * 1000)) // 15 minutes
     public void loadAuthUsers() {
     	for (AuthUser authUser : dao.getAuthUsers()) {
@@ -56,3 +50,4 @@ public class ScheduledTasks {
         log.info("Scheduled loading of new authorization users {}", dateFormat.format(new Date()));
     }
 }
+*/

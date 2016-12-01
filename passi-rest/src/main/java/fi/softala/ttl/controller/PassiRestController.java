@@ -5,7 +5,9 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
@@ -210,6 +212,18 @@ public class PassiRestController {
 			return new ResponseEntity<Void>(HttpStatus.CONFLICT);
 		}
 		return new ResponseEntity<Void>(HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/feedbackmap/{group}/{user}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Map<Integer, Integer>> getFeedbackCompleteMap(
+			@PathVariable("group") int groupID,
+			@PathVariable("user") int userID) {
+		Map<Integer, Integer> feedbackCompleteMap = new HashMap<>();
+		feedbackCompleteMap = passiService.feedbackCompleteMap(groupID, userID);
+		if (feedbackCompleteMap.isEmpty()) {
+			return new ResponseEntity<Map<Integer, Integer>>(feedbackCompleteMap, HttpStatus.NO_CONTENT);
+		}
+		return new ResponseEntity<Map<Integer, Integer>>(feedbackCompleteMap, HttpStatus.OK);
 	}
 
 	/**

@@ -6,7 +6,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -426,5 +428,23 @@ public class PassiDAOImpl implements PassiDAO {
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public Map<Integer, Integer> feedbackCompleteMap(int groupID, int userID) {
+		final String SQL = "SELECT worksheet_id, feedback_complete FROM answersheets WHERE group_id = ? AND user_id = ?";
+		Map<Integer, Integer> feedbackCompleteMap = new HashMap<>();
+		feedbackCompleteMap = jdbcTemplate.query(SQL, new Object[] { groupID, userID }, new ResultSetExtractor<Map<Integer, Integer>>() {
+			
+			 @Override
+			 public Map<Integer, Integer> extractData(ResultSet rs) throws SQLException, DataAccessException {
+				 HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
+			     while(rs.next()){
+			         map.put(rs.getInt("worksheet_id"), rs.getInt("feedback_complete"));
+			     }
+			     return map;
+			 }
+		});
+		return feedbackCompleteMap;
 	}
 }

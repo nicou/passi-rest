@@ -1,6 +1,7 @@
 package fi.softala.ttl.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,5 +34,7 @@ public interface PassiService {
 	public boolean isGroupExist(String key);
 	
 	public boolean joinUserIntoGroup(String key, int userID);
+	
+	public Map<Integer, Integer> feedbackCompleteMap(int groupID, int userID);
 	
 }

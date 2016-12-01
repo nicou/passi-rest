@@ -1,6 +1,7 @@
 package fi.softala.ttl.service;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -144,5 +145,11 @@ public class PassiServiceImpl implements PassiService {
 	@Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE)
 	public boolean joinUserIntoGroup(String key, int userID) {
 		return dao.joinUserIntoGroup(key, userID);
+	}
+
+	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
+	public Map<Integer, Integer> feedbackCompleteMap(int groupID, int userID) {
+		return dao.feedbackCompleteMap(groupID, userID);
 	}
 }
