@@ -438,7 +438,7 @@ public class PassiDAOImpl implements PassiDAO {
 			
 			 @Override
 			 public Map<Integer, Integer> extractData(ResultSet rs) throws SQLException, DataAccessException {
-				 HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
+				 HashMap<Integer, Integer> map = new HashMap<>();
 			     while(rs.next()){
 			         map.put(rs.getInt("worksheet_id"), rs.getInt("feedback_complete"));
 			     }
