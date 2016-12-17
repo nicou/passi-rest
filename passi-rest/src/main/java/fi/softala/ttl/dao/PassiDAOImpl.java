@@ -254,6 +254,16 @@ public class PassiDAOImpl implements PassiDAO {
 		return false;
 	}
 	
+	public Map<String, Long> getProgress(String username) {
+		Map<String, Long> progress = new HashMap<>();
+		
+		final String SQL = "SELECT (SELECT COUNT(*) FROM answersheets WHERE user_id = (SELECT user_id FROM users WHERE username = ?)) AS completed, COUNT(*) AS total FROM worksheets";
+		for (Map m : jdbcTemplate.queryForList(SQL, new Object[] { username })) {
+			progress = m;
+		}
+		return progress;
+	}
+	
 	// Delete answer
 	public boolean deleteAnswer(int worksheetID, int userID) {
 		DefaultTransactionDefinition paramTransactionDefinition = new DefaultTransactionDefinition();

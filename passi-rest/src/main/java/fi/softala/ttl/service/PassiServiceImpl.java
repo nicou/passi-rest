@@ -152,4 +152,10 @@ public class PassiServiceImpl implements PassiService {
 	public Map<Integer, Integer> feedbackCompleteMap(int groupID, int userID) {
 		return dao.feedbackCompleteMap(groupID, userID);
 	}
+	
+	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
+	public Map<String, Long> getProgress(String username) {
+		return dao.getProgress(username);
+	}
 }

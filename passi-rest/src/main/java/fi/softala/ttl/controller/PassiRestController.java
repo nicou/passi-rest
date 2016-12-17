@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -92,7 +94,10 @@ public class PassiRestController {
 	 * instructors; HttpStatus
 	 */
 	@RequestMapping(value = "/user/{username}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<User> getUser(@PathVariable("username") String username) {
+	public ResponseEntity<User> getUser(@PathVariable("username") String username, Principal principal) {
+		if (username == null || username != null && !username.equals(principal.getName())) {
+			throw new UserNotFoundException(username);
+		}
 		User user = passiService.findUser(username);
 		if (user == null)
 			throw new UserNotFoundException(username);
@@ -212,6 +217,16 @@ public class PassiRestController {
 			return new ResponseEntity<Void>(HttpStatus.CONFLICT);
 		}
 		return new ResponseEntity<Void>(HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/progress/", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Map<String, Long>> getProgress(Principal principal) {
+		Map<String, Long> progress = passiService.getProgress(principal.getName());
+		if (progress.isEmpty()) {
+			return new ResponseEntity<Map<String,Long>>(progress, HttpStatus.NO_CONTENT);
+		}
+		System.out.println("Got progress: " + progress.get("completed") + "/" + progress.get("total"));
+		return new ResponseEntity<Map<String,Long>>(progress, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/feedbackmap/{group}/{user}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

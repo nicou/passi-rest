@@ -37,4 +37,6 @@ public interface PassiService {
 	
 	public Map<Integer, Integer> feedbackCompleteMap(int groupID, int userID);
 	
+	public Map<String, Long> getProgress(String username);
+	
 }
