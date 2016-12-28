@@ -77,8 +77,8 @@ public class PassiServiceImpl implements PassiService {
 	 */
 	@Override
 	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
-	public List<Category> getWorksheets(int groupID) {
-		return dao.getWorksheets(groupID);
+	public List<Category> getWorksheets(int groupID, String username) {
+		return dao.getWorksheets(groupID, username);
 	}
 
 	/**

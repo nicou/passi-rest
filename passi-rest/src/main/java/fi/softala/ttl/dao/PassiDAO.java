@@ -17,7 +17,7 @@ public interface PassiDAO {
 	
 	public boolean addUser(AuthUser user);
 	
-	public List<Category> getWorksheets(int groupID);
+	public List<Category> getWorksheets(int groupID, String username);
 	
 	public boolean isAnswerExist(int worksheetID, int userID);
 	

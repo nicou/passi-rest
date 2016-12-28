@@ -163,7 +163,7 @@ public class PassiDAOImpl implements PassiDAO {
 	}
 
 	// Get worksheets by group ID
-	public List<Category> getWorksheets(int groupID) {
+	public List<Category> getWorksheets(int groupID, String username) {
 
 		final String SQL1 = "SELECT categories.category_id, categories.category_name FROM categories";
 
@@ -178,16 +178,12 @@ public class PassiDAOImpl implements PassiDAO {
 			}
 		});
 
-		final String SQL2 = "SELECT worksheets.worksheet_id, worksheets.header, "
-				+ "worksheets.preface, worksheets.planning FROM worksheets "
-				+ "JOIN distros ON distros.worksheet_id = worksheets.worksheet_id "
-				+ "JOIN categories ON worksheets.category_id = categories.category_id "
-				+ "WHERE distros.group_id = ? AND categories.category_id = ?";
-
-		for (Category category : categories) {
+		final String SQL2 = "SELECT worksheets.worksheet_id, worksheets.header, worksheets.preface, worksheets.planning, (SELECT COUNT(*) FROM answersheets WHERE group_id = ? AND user_id = (SELECT user_id FROM users WHERE username = ?) AND worksheet_id = worksheets.worksheet_id) AS completed FROM worksheets JOIN distros ON distros.worksheet_id = worksheets.worksheet_id JOIN categories ON worksheets.category_id = categories.category_id WHERE distros.group_id = ? AND categories.category_id = ?";
+				
+				for (Category category : categories) {
 
 			List<Worksheet> worksheets = new ArrayList<>();
-			worksheets = jdbcTemplate.query(SQL2, new Object[] { groupID, category.getCategoryID() },
+			worksheets = jdbcTemplate.query(SQL2, new Object[] { groupID, username, groupID, category.getCategoryID() },
 					new RowMapper<Worksheet>() {
 
 						@Override
@@ -197,6 +193,9 @@ public class PassiDAOImpl implements PassiDAO {
 							worksheet.setWorksheetHeader(rs.getString("header"));
 							worksheet.setWorksheetPreface(rs.getString("preface"));
 							worksheet.setWorksheetPlanning(rs.getString("planning"));
+							if (rs.getInt("completed") > 0) {
+								worksheet.setWorksheetCompleted(true);
+							}
 							return worksheet;
 						}
 					});

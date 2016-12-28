@@ -128,8 +128,8 @@ public class PassiRestController {
 	 * @return List<Category> as JSON including Worksheets, Waypoints, Options; HttpStatus
 	 */
 	@RequestMapping(value = "/worksheet/{group}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<Category>> getWorksheets(@PathVariable("group") int groupID) {
-		List<Category> categorizedWorksheets = passiService.getWorksheets(groupID);
+	public ResponseEntity<List<Category>> getWorksheets(@PathVariable("group") int groupID, Principal principal) {
+		List<Category> categorizedWorksheets = passiService.getWorksheets(groupID, principal.getName());
 		if (categorizedWorksheets.size() == 0)
 			throw new WorksheetNotFoundException(groupID);
 		log.debug("getWorksheets() : Requested categorized worksheets List<Category> found for JSON response");
@@ -225,7 +225,6 @@ public class PassiRestController {
 		if (progress.isEmpty()) {
 			return new ResponseEntity<Map<String,Long>>(progress, HttpStatus.NO_CONTENT);
 		}
-		System.out.println("Got progress: " + progress.get("completed") + "/" + progress.get("total"));
 		return new ResponseEntity<Map<String,Long>>(progress, HttpStatus.OK);
 	}
 	
