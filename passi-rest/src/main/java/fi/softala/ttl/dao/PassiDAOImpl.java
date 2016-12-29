@@ -396,6 +396,12 @@ public class PassiDAOImpl implements PassiDAO {
 
 		return answersheet;
 	}
+	
+	// Check if userID matches username
+	public boolean isCorrectUser(int userID, String username) {
+		final String SQL = "SELECT COUNT(*) FROM users WHERE user_id = ? AND username = ?";
+		return jdbcTemplate.queryForObject(SQL, new Object[] { userID, username}, Integer.class) == 1;
+	}
 
 	// Get all instructor users for basic authentication
 	@Override

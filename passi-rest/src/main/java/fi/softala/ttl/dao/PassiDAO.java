@@ -37,4 +37,6 @@ public interface PassiDAO {
 	
 	public Map<String, Long> getProgress(String username);
 	
+	public boolean isCorrectUser(int userID, String username);
+	
 }

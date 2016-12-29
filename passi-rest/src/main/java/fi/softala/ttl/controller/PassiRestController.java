@@ -96,7 +96,7 @@ public class PassiRestController {
 	@RequestMapping(value = "/user/{username}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<User> getUser(@PathVariable("username") String username, Principal principal) {
 		if (username == null || username != null && !username.equals(principal.getName())) {
-			throw new UserNotFoundException(username);
+			return new ResponseEntity<User>(HttpStatus.FORBIDDEN);
 		}
 		User user = passiService.findUser(username);
 		if (user == null)
@@ -143,8 +143,12 @@ public class PassiRestController {
 	 * @return String message, HttpStatus
 	 */
 	@RequestMapping(value = "/answer/", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> saveAnswer(@RequestBody Answersheet answersheet) {
+	public ResponseEntity<String> saveAnswer(@RequestBody Answersheet answersheet, Principal principal) {
 		String message = new String("");
+		if (!passiService.isCorrectUser(answersheet.getUserID(), principal.getName())) {
+			message = "Invalid userID";
+			return new ResponseEntity<String>(message, HttpStatus.CONFLICT);
+		}
 		if (passiService.isAnswerExist(answersheet.getWorksheetID(), answersheet.getUserID())) {
 			message = "User [" + answersheet.getUserID() + "] has already answered to the worksheet ["
 					+ answersheet.getWorksheetID() + "].";
@@ -168,36 +172,15 @@ public class PassiRestController {
 	 */
 	@RequestMapping(value = "/answer/{worksheet}/{group}/{user}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Answersheet> getAnswers(@PathVariable("worksheet") int worksheetID,
-			@PathVariable("group") int groupID, @PathVariable("user") int userID) {
+			@PathVariable("group") int groupID, @PathVariable("user") int userID,
+			Principal principal) {
+		if (!passiService.isCorrectUser(userID, principal.getName())) {
+			return new ResponseEntity<Answersheet>(new Answersheet(), HttpStatus.FORBIDDEN);
+		}
 		Answersheet answersheet = passiService.getAnswers(worksheetID, groupID, userID);
 		if (answersheet == null)
 			throw new EmptyAnswerContentException(worksheetID, groupID, userID);
 		return new ResponseEntity<Answersheet>(answersheet, HttpStatus.OK);
-	}
-
-	/**
-	 * Delete student answers. Tool for mobile client development. Supposed to
-	 * be removed when not needed anymore.
-	 * 
-	 * @param worksheetID
-	 * @param userID
-	 * @return Sring message, HttpStatus
-	 */
-	@RequestMapping(value = "/answer/{worksheet}/{user}", method = RequestMethod.DELETE)
-	public ResponseEntity<String> deleteAnswer(@PathVariable("worksheet") int worksheetID,
-			@PathVariable("user") int userID) {
-		String message = new String("");
-		if (!passiService.isAnswerExist(worksheetID, userID)) {
-			message = "Deleting failed. Required answers not found.";
-			return new ResponseEntity<String>(message, HttpStatus.NOT_FOUND);
-		}
-		if (passiService.deleteAnswer(worksheetID, userID)) {
-			message = "Answers successfully deleted.";
-			return new ResponseEntity<String>(message, HttpStatus.NO_CONTENT);
-		} else {
-			message = "Deleting answers interrupted for unknown reason. All data restored.";
-			return new ResponseEntity<String>(message, HttpStatus.EXPECTATION_FAILED);
-		}
 	}
 	
 	/**
@@ -209,7 +192,11 @@ public class PassiRestController {
 	@RequestMapping(value = "/join/{key}/{user}", method = RequestMethod.GET)
 	public ResponseEntity<Void> joinGroup(
 			@PathVariable("user") int userID,
-			@PathVariable("key") String key) {
+			@PathVariable("key") String key,
+			Principal principal) {
+		if (!passiService.isCorrectUser(userID, principal.getName())) {
+			return new ResponseEntity<Void>(HttpStatus.FORBIDDEN);
+		}
 		if (!passiService.isGroupExist(key)) {
 			return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
 		}
@@ -231,8 +218,12 @@ public class PassiRestController {
 	@RequestMapping(value = "/feedbackmap/{group}/{user}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Map<Integer, Integer>> getFeedbackCompleteMap(
 			@PathVariable("group") int groupID,
-			@PathVariable("user") int userID) {
+			@PathVariable("user") int userID,
+			Principal principal) {
 		Map<Integer, Integer> feedbackCompleteMap = new HashMap<>();
+		if (!passiService.isCorrectUser(userID, principal.getName())) {
+			return new ResponseEntity<Map<Integer, Integer>>(feedbackCompleteMap, HttpStatus.FORBIDDEN);
+		}
 		feedbackCompleteMap = passiService.feedbackCompleteMap(groupID, userID);
 		if (feedbackCompleteMap.isEmpty()) {
 			return new ResponseEntity<Map<Integer, Integer>>(feedbackCompleteMap, HttpStatus.NO_CONTENT);
@@ -241,7 +232,7 @@ public class PassiRestController {
 	}
 
 	/**
-	 * Single JPEG image file upload as raw binary for hign-performance upload
+	 * Single JPEG image file upload as raw binary for high-performance upload
 	 * from mobile client
 	 * 
 	 * @param file name without extension (.jpg)

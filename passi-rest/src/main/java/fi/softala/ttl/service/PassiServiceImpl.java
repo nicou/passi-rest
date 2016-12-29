@@ -158,4 +158,10 @@ public class PassiServiceImpl implements PassiService {
 	public Map<String, Long> getProgress(String username) {
 		return dao.getProgress(username);
 	}
+	
+	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
+	public boolean isCorrectUser(int userID, String username) {
+		return dao.isCorrectUser(userID, username);
+	}
 }
