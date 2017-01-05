@@ -230,6 +230,27 @@ public class PassiRestController {
 		}
 		return new ResponseEntity<Map<Integer, Integer>>(feedbackCompleteMap, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/answer/{worksheet}/{user}", method = RequestMethod.DELETE)
+	public ResponseEntity<String> deleteAnswer(@PathVariable("worksheet") int worksheetID,
+			@PathVariable("user") int userID, Principal principal) {
+		String message = new String("");
+		if (!passiService.isCorrectUser(userID, principal.getName())) {
+			message = "You have no permission to do that";
+			return new ResponseEntity<String>(message, HttpStatus.FORBIDDEN);
+		}
+		if (!passiService.isAnswerExist(worksheetID, userID)) {
+			message = "Deleting failed. Required answers not found.";
+			return new ResponseEntity<String>(message, HttpStatus.NOT_FOUND);
+		}
+		if (passiService.deleteAnswer(worksheetID, userID)) {
+			message = "Answers successfully deleted.";
+			return new ResponseEntity<String>(message, HttpStatus.NO_CONTENT);
+		} else {
+			message = "Deleting answers interrupted for unknown reason. All data restored.";
+			return new ResponseEntity<String>(message, HttpStatus.EXPECTATION_FAILED);
+		}
+	}
 
 	/**
 	 * Single JPEG image file upload as raw binary for high-performance upload
