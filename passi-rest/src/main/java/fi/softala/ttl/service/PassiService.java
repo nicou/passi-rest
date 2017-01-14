@@ -21,6 +21,8 @@ public interface PassiService {
 	
 	public User findUser(String username);
 	
+	public User findUser(String username, String email);
+	
 	public List<Category> getWorksheets(int groupID, String username);
 
 	public Answersheet getAnswers(int worksheetID, int groupID, int userID);

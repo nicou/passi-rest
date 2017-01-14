@@ -59,10 +59,19 @@ public class PassiDAOImpl implements PassiDAO {
 	@Autowired
 	private PlatformTransactionManager platformTransactionManager;
 
-	// Find and return user with all related data
+	// Find and return user with all related data using only username
 	public User findUser(String username) {
-		final String SQL1 = "SELECT user_id, username, firstname, lastname, email FROM users WHERE username = ?";
-		User user = jdbcTemplate.query(SQL1, new Object[] { username }, new ResultSetExtractor<User>() {
+		return findUser(username, null);
+	}
+	
+	// Find and return user with all related data using username or email
+	public User findUser(String username, String email) {
+		final String SQL1 = email == null ? 
+				"SELECT user_id, username, firstname, lastname, email FROM users WHERE username = ?" : 
+				"SELECT user_id, username, firstname, lastname, email FROM users WHERE username = ? OR email = ?";
+		
+		User user = jdbcTemplate.query(SQL1, email == null ? new Object[] { username } : new Object[] { username, email }, 
+				new ResultSetExtractor<User>() {
 
 			@Override
 			public User extractData(ResultSet rs) throws SQLException, DataAccessException {

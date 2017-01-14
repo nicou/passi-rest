@@ -68,6 +68,12 @@ public class PassiServiceImpl implements PassiService {
 	public User findUser(String username) {
 		return dao.findUser(username);
 	}
+	
+	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
+	public User findUser(String username, String email) {
+		return dao.findUser(username, email);
+	}
 
 	/**
 	 * Get worksheets of a group sorted in categories

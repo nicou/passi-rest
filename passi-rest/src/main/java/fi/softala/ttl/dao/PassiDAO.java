@@ -15,6 +15,8 @@ public interface PassiDAO {
 	
 	public User findUser(String username);
 	
+	public User findUser(String username, String email);
+	
 	public boolean addUser(AuthUser user);
 	
 	public List<Category> getWorksheets(int groupID, String username);

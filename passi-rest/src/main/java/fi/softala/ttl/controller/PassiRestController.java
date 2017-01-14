@@ -107,7 +107,7 @@ public class PassiRestController {
 	
 	@RequestMapping(value = "/register/", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Void> registerUser(@RequestBody AuthUser user) {
-		User userData = passiService.findUser(user.getUsername());
+		User userData = passiService.findUser(user.getUsername(), user.getEmail());
 		if (userData != null) {
 			return new ResponseEntity<Void>(HttpStatus.CONFLICT);
 		}
