@@ -93,7 +93,7 @@ public class PassiRestController {
 	 * @return User as JSON including user data, user's groups, groups'
 	 * instructors; HttpStatus
 	 */
-	@RequestMapping(value = "/user/{username}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/user/{username:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<User> getUser(@PathVariable("username") String username, Principal principal) {
 		if (username == null || username != null && !username.equals(principal.getName())) {
 			return new ResponseEntity<User>(HttpStatus.FORBIDDEN);
