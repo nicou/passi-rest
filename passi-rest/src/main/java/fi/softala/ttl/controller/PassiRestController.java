@@ -5,7 +5,6 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -95,10 +94,10 @@ public class PassiRestController {
 	 */
 	@RequestMapping(value = "/user/{username:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<User> getUser(@PathVariable("username") String username, Principal principal) {
-		if (username == null || username != null && !username.equals(principal.getName())) {
+		if (username == null || username != null && !username.toLowerCase().equals(principal.getName())) {
 			return new ResponseEntity<User>(HttpStatus.FORBIDDEN);
 		}
-		User user = passiService.findUser(username);
+		User user = passiService.findUser(username.trim());
 		if (user == null)
 			throw new UserNotFoundException(username);
 		log.debug("getUser() : Requested user found for JSON response - User: {}", user);
@@ -107,9 +106,18 @@ public class PassiRestController {
 	
 	@RequestMapping(value = "/register/", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Void> registerUser(@RequestBody AuthUser user) {
+		// Trim all values
+		user.setUsername(user.getUsername().trim().toLowerCase());
+		user.setEmail(user.getEmail().trim());
+		user.setFirstname(user.getFirstname().trim());
+		user.setLastname(user.getLastname().trim());
+		
 		User userData = passiService.findUser(user.getUsername(), user.getEmail());
 		if (userData != null) {
 			return new ResponseEntity<Void>(HttpStatus.CONFLICT);
+		}
+		if (!user.getUsername().matches("^[A-zÄÖäöÅå0-9-._]{0,30}$")) {
+			return new ResponseEntity<Void>(HttpStatus.FAILED_DEPENDENCY);
 		}
 		if (!passiService.addUser(user)) {
 			return new ResponseEntity<Void>(HttpStatus.EXPECTATION_FAILED);
