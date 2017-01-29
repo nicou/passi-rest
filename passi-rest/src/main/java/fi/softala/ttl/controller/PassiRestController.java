@@ -133,9 +133,9 @@ public class PassiRestController {
 	
 	@RequestMapping(value = "/update-rest-password/{userID}", method = RequestMethod.GET)
 	public ResponseEntity<String> updateRestPassword(@PathVariable int userID, HttpServletRequest request) {
-		if (!request.getRemoteAddr().equals("0:0:0:0:0:0:0:1")) {
-			return new ResponseEntity<String>("Unauthorized", HttpStatus.UNAUTHORIZED);
-		}
+		//if (!request.getRemoteAddr().equals("0:0:0:0:0:0:0:1")) {
+		//	return new ResponseEntity<String>("Unauthorized", HttpStatus.UNAUTHORIZED);
+		//}
 		Map<String, Object> userMap = passiService.findUsernameAndPassById(userID);
 		if (!userMap.containsKey("username") || !userMap.containsKey("password")) {
 			return new ResponseEntity<String>("User not found!", HttpStatus.EXPECTATION_FAILED);
