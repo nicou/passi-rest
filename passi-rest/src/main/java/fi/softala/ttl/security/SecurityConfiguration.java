@@ -63,7 +63,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   
       http.csrf().disable()
         .authorizeRequests()
-        .antMatchers("/", "/register/**").permitAll()
+        .antMatchers("/", "/register/**", "/update-rest-password/**").permitAll()
         .antMatchers("/user/**", "/student/**", "/worksheet/**", "/answer/**", "/join/**", "/upload/**").hasRole("USER")
         .and().httpBasic().realmName(REALM).authenticationEntryPoint(getBasicAuthEntryPoint())
         .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

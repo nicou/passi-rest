@@ -170,4 +170,10 @@ public class PassiServiceImpl implements PassiService {
 	public boolean isCorrectUser(int userID, String username) {
 		return dao.isCorrectUser(userID, username);
 	}
+	
+	@Override
+	@Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
+	public Map<String, Object> findUsernameAndPassById(int userID) {
+		return dao.findUsernameAndPassById(userID);
+	}
 }

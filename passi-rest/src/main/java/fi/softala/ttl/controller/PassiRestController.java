@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -127,6 +129,24 @@ public class PassiRestController {
 				passwordEncoder.encode(user.getPassword()), Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))));
 		log.debug("registerUser() : User successfully registered and added to authetication users");
 		return new ResponseEntity<Void>(HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/update-rest-password/{userID}", method = RequestMethod.GET)
+	public ResponseEntity<String> updateRestPassword(@PathVariable int userID, HttpServletRequest request) {
+		if (!request.getRemoteAddr().equals("0:0:0:0:0:0:0:1")) {
+			return new ResponseEntity<String>("Unauthorized", HttpStatus.UNAUTHORIZED);
+		}
+		Map<String, Object> userMap = passiService.findUsernameAndPassById(userID);
+		if (!userMap.containsKey("username") || !userMap.containsKey("password")) {
+			return new ResponseEntity<String>("User not found!", HttpStatus.EXPECTATION_FAILED);
+		}
+		inMemoryUserDetailsManager.deleteUser(userMap.get("username").toString());
+		inMemoryUserDetailsManager.createUser(
+				new org.springframework.security.core.userdetails.User(
+						userMap.get("username").toString(),
+						userMap.get("password").toString(),
+						Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))));
+		return new ResponseEntity<String>("Password refreshed for user " + userMap.get("username").toString(), HttpStatus.OK);
 	}
 
 	/**

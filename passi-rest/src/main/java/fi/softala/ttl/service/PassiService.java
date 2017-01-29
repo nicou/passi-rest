@@ -23,6 +23,8 @@ public interface PassiService {
 	
 	public User findUser(String username, String email);
 	
+	public Map<String, Object> findUsernameAndPassById(int userID);
+	
 	public List<Category> getWorksheets(int groupID, String username);
 
 	public Answersheet getAnswers(int worksheetID, int groupID, int userID);

@@ -291,6 +291,17 @@ public class PassiDAOImpl implements PassiDAO {
 		}
 		return true;
 	}
+	
+	public Map<String, Object> findUsernameAndPassById(int userID) {
+		Map<String, Object> userMap = new HashMap<>();
+		String SQL = "SELECT username, password FROM users JOIN user_role USING (user_id) WHERE user_id = ? AND role_id = 1";
+		try {
+			userMap = jdbcTemplate.queryForMap(SQL, new Object[] { userID });
+		} catch (Exception ex) {
+			System.out.println(ex);
+		}
+		return userMap;
+	}
 
 	// Save user answer
 	public boolean saveAnswer(Answersheet answersheet) {

@@ -41,4 +41,6 @@ public interface PassiDAO {
 	
 	public boolean isCorrectUser(int userID, String username);
 	
+	public Map<String, Object> findUsernameAndPassById(int userID);
+	
 }
